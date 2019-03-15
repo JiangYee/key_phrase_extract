@@ -168,37 +168,6 @@ def load_all_data_json(json_file_path, vocab):
     return [docs, key_phrases, key_phrase_extracs]
 
 
-# 使用es获取全部文档的topn篇相关文档（相似性计算文档）
-def get_es_results(abstracts, top_n):
-    es_results = []
-    config = Config()
-    search = Search()
-
-    for abstract in abstracts:
-        print(search.search_by_abstract(abstract, top_n, config))
-        es_results.append(search.search_by_abstract(abstract, top_n, config))
-
-    return es_results
-
-# 获取文章的abstract
-def get_docs(file_path):
-    docs = []
-    with codecs.open(filename=file_path, encoding='utf-8') as fp:
-        while True:
-            line = fp.readline()
-            if not line:
-                print('get docs successful!')
-                return docs
-
-            tmp = line.strip().split('\t')
-            docs.append(tmp[0])
-            # doc_split = tmp[0].split(' ')
-            # for m in range(len(doc_split)):
-            #     if not vocab.__contains__(doc_split[m]):
-            #         doc_split[m] = 'unknown'
-            # docs.append(doc_split)
-
-
 # 加载词向量/计算文档向量
 def doc2vec(vector_model, docs):
     all_doc_vectors = []
@@ -331,79 +300,6 @@ def extract_all(all_doc_sim, all_original_kp, topN, all_kp_extracs, p):
     return all_merged_kp
 
 
-def extract_all_es(es_results, vector_model, topN, p):
-    all_merged_kp = []
-    # 对一篇文档：
-    for  es_result in es_results:
-        # es_result 包含目标文档的数据
-        is_error = False
-        # 获取当前文档的rake抽取结果
-        rake_extract = es_result[0][3]  # 目标文档在es 搜索结果的第一条
-        # ============================================
-        # 对rake_extract 处理  rake_extract ->字符串
-        rake_extract_dict = {}
-        extracs_tmp = rake_extract.split('###')
-        doc_phrase_weight = {}
-        for m in range(len(extracs_tmp)):
-            extracs_phrase_weight = extracs_tmp[m].split('|||')
-            try:
-                rake_extract_dict.update({extracs_phrase_weight[1]: float(extracs_phrase_weight[0])})
-            except (Exception) as e:
-                print('Exception:', str(e))
-                print('该行提取的关键术语数据有误：' + str(rake_extract))
-                print('具体数据错误：' + str(extracs_phrase_weight))
-                is_error = True
-                m = len(extracs_tmp) + 1
-                continue
-        # ================================================
-        if not is_error:
-            abstracts = []
-            keywords = []
-            for data in es_result:
-                # 获取当前文档的es检索结果文档
-                abs_split = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9~!@#$%^&*()_+<>?:,./;’，。、‘：“《》？~！@#￥%……（）]', ' ', data[1]).split(' ')
-                for j in range(len(abs_split)):
-                    if not vocab.__contains__(abs_split[j]):
-                        abs_split[j] = 'unknown'
-                abstracts.append(abs_split)
-                # abstracts.append(re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9~!@#$%^&*()_+<>?:,./;’，。、‘：“《》？~！@#￥%……（）]', ' ', data[1]))
-
-                # 获取结果文档的原始关键术语
-                keywords.append(data[2])
-
-            doc_vectors = doc2vec(vector_model, abstracts)
-            doc_sims = calculate_doc_sim(doc_vectors)
-            # 根据向量相似度大小取topN篇相似文档
-            topN_doc_sims = doc_sims[:topN + 1]  # 相似文档里包含里目标文档本身
-
-            # =============相似性计算不同
-            external_dict = get_external(topN_doc_sims, keywords, currunt_docID=0)
-
-            # 添加归一化操作
-            external_dict = normalization(external_dict)
-            rake_extract_dict = normalization(rake_extract_dict)
-
-            one_merge_dict = merge(rake_extract_dict, external_dict, p)
-            all_merged_kp.append(one_merge_dict)
-    #
-    # for i in range(len(all_doc_sim)):
-    #     # 取topN篇相似文档
-    #     topN_doc_sims = all_doc_sim[i][:topN + 1]  # 相似文档里包含里目标文档本身
-    #
-    #     external_dict = get_external(topN_doc_sims, all_original_kp, currunt_docID=i)
-    #     original_dict = all_kp_extracs[i]
-    #     # 添加归一化操作
-    #     external_dict = normalization(external_dict)
-    #     original_dict = normalization(original_dict)
-    #     # print('归一化后......')
-    #     # print('外部结果：' + str(sorted(external_dict.items(), key=lambda d: d[1], reverse=True)))
-    #     # print('内部结果：' + str(sorted(original_dict.items(), key=lambda d: d[1], reverse=True)))
-    #
-    #     one_merge_dict = merge(original_dict, external_dict, p)
-    #     all_merged_kp.append(one_merge_dict)
-    return all_merged_kp
-
-
 # 获取每篇文档的topK个融合的关键术语
 def get_topK_kp(all_merged_kp, k):
     topK_merged_kp = []
@@ -528,9 +424,9 @@ if __name__ == '__main__':
     # prepare for data
     vocab = load_vocab(vocab_dir)
     # docs, all_original_kp, all_kp_extracs = load_all_data(file_path, vocab)
-    # docs, all_original_kp, all_kp_extracs = load_all_data_json(file_path_json, vocab)
-    # all_doc_vectors = doc2vec(word2vec_model, docs)
-    # all_doc_sim = calculate_doc_sim(all_doc_vectors)
+    docs, all_original_kp, all_kp_extracs = load_all_data_json(file_path_json, vocab)
+    all_doc_vectors = doc2vec(word2vec_model, docs)
+    all_doc_sim = calculate_doc_sim(all_doc_vectors)
 
     # doc_sim = calculate_doc_sim(all_doc_vectors)
     # for i in range(len(doc_sim)):
@@ -538,8 +434,7 @@ if __name__ == '__main__':
     #     print(str(doc_sim[i][:11]))
     #     print('\n')
 
-    abstract_list = get_docs(file_path)
-    es_results = get_es_results(abstract_list, 5)
+
 
     # merge:
     for p in p_list:
@@ -551,8 +446,7 @@ if __name__ == '__main__':
             os.makedirs(p_evaluate_dir)
 
         all_merged_dir = os.path.join(p_evaluate_dir, 'all_merged.txt')
-        # all_merged_kp = extract_all(all_doc_sim, all_original_kp, topN, all_kp_extracs, p)
-        all_merged_kp =extract_all_es(es_results, word2vec_model, 3, p)
+        all_merged_kp = extract_all(all_doc_sim, all_original_kp, topN, all_kp_extracs, p)
         # print('内外部融合结果：')
         # for i in range(len(all_merged_kp)):
         #     print(sorted(all_merged_kp[i].items(), key=lambda d: d[1], reverse=True))
