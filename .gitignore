@@ -109,10 +109,37 @@ venv.bak/
 /.idea/
 /data/rake_extract_keyphrase.json
 /data/rake_extract_keyphrase.txt
-/data/stopwords.txt
 /data/doc_test.txt
 /data/sg.word2vec.300d
 /data/vocab_sg300d.txt
 /evaluate/
 /evaluate.tar.gz
 /test/
+/evaluate_doc2vec_model10w/
+/evaluate_es_10w_doc2vec1/
+/evaluate_es_57w_doc2vec/
+/evaluate_es_doc10/
+/evaluate_es_doc20/
+/evaluate_es_doc100/
+/evaluate_es_doc100_doc2vec/
+/evaluate_rake_10w/
+/evaluate_rake_p/
+/test_normalization_results/
+/merge_info/
+/data/error_info
+/data/es_search.txt
+/evaluate_es_10w_doc2vec/
+/doc2vec/
+/evaluate_es_10w_doc2vec2/
+将删除 data/evaluate_rake.py
+将删除 data/get_search_results.py
+将删除 data/process_doc2vec.py
+将删除 data/process_doc2vec_eg1.py
+将删除 data/process_doc2vec_get_merge_info.py
+将删除 data/process_doc2vec_model10w.py
+将删除 data/process_doc2vec_test1.py
+将删除 data/process_temp.py
+将删除 data/rake_extract_keyphrase_12.json
+将删除 evaluate_es_10w_doc2vec2/
+将删除 ir_eg/
+将删除 test.py

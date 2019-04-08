@@ -88,7 +88,7 @@ def get_external(topN_doc_sims, keywords, currunt_docID):
 
 # 对于一篇文档： 融合其topN篇相似的外部文档的全部key phrase
 def get_external_doc2vec(topN_doc_sims, keywords, currunt_docID):
-    # topN_doc_sims:[(6,0.9),(10,0.8),(3,0.5)...],topN * 2 一篇文档的相似文档及相似度集合
+    # topN_doc_sims:[(125466,0.9),(10,0.8),(3000,0.5)...],topN * 2 --> gensim.models.most_similar()
     # keywords: es结果集中的所有文档的原始关键术语
     external_key_phrase = {}
     key_phrases = {}  # {'k1':[0.2,0.3]; 'k2':[0.5,0.6,0.8]}
@@ -216,15 +216,10 @@ def get_all_merge_info(es_results, vector_model, vocab, topN):
         # es_result 包含目标文档的数据
         is_error = False
         # 获取当前文档的rake抽取结果
-        try:
-            rake_extract = es_result[0][3]  # 目标文档在es 搜索结果的第一条
-
+        rake_extract = es_result[0][3]  # 目标文档在es 搜索结果的第一条
         # 处理目标文档的rake_extract
-            rake_extract_dict = {}
-            extracs_tmp = rake_extract.split('###')
-        except (Exception) as e:
-            print(e)
-            print(es_result)
+        rake_extract_dict = {}
+        extracs_tmp = rake_extract.split('###')
         for m in range(len(extracs_tmp)):
             extracs_phrase_weight = extracs_tmp[m].split('|||')
             try:
@@ -268,45 +263,31 @@ def get_all_merge_info(es_results, vector_model, vocab, topN):
     return all_merged_info
 
 
-def get_all_merge_info_doc2vec(es_results, doc2vec_model, topN):
+def get_all_merge_info_doc2vec(ids, all_keywords,all_rake_dict, doc2vec_model, topN):
     print('get_all_merge_info_doc2vec:...')
+    print('ids: ' + str(ids))
     start_time = time.time()
     all_merged_info = []
     # 对一篇文档：
-    for es_result in es_results:
-        # es_result 包含目标文档的数据
-        is_error = False
-        # 获取当前文档的rake抽取结果
-        rake_extract = es_result[0][3]  # 目标文档在es 搜索结果的第一条
-        # 处理目标文档的rake_extract
-        rake_extract_dict = {}
-        extracs_tmp = rake_extract.split('###')
-        for m in range(len(extracs_tmp)):
-            extracs_phrase_weight = extracs_tmp[m].split('|||')
-            try:
-                rake_extract_dict.update({extracs_phrase_weight[1]: float(extracs_phrase_weight[0])})
-            except (Exception) as e:
-                print('Exception:', str(e))
-                print('该行提取的关键术语数据有误：' + str(rake_extract))
-                print('具体数据错误：' + str(extracs_phrase_weight))
-                is_error = True
-                m = len(extracs_tmp) + 1
-                continue
-        if not is_error:
-            # 获取结果文档的原始关键术语
-            keywords = [data[2].split(';') for data in es_result]
+    for doc_id in ids:
+        # 使用gensim doc_vecter_model
+        doc_vector = doc2vec_model.docvecs[doc_id]
+        topN_doc_sims = doc2vec_model.docvecs.most_similar([doc_vector], topn=topN)  # 在模型全部数据（57w）中抽取相似文档
+        print('相似文档================')
+        print(topN_doc_sims)
+        print('======================\n')
+        keywords = []
+        for id_sim in topN_doc_sims:
+            id = id_sim[0]
+            keywords.append(all_keywords[id])
 
-            # 使用gensim doc_vecter_model
-            doc_id = int(es_result[0][0])
-            doc_vector = doc2vec_model.docvecs[doc_id]
-            topN_doc_sims = doc2vec_model.docvecs.most_similar([doc_vector], topn=topN)
+        external_dict = get_external_doc2vec(topN_doc_sims, keywords, currunt_docID=0)
 
-            external_dict = get_external_doc2vec(topN_doc_sims, keywords, currunt_docID=0)
-
-            # 添加归一化操作
-            external_dict = data_IO.normalization(external_dict)
-            rake_extract_dict = data_IO.normalization(rake_extract_dict)
-            all_merged_info.append([external_dict, rake_extract_dict])
+        # 添加归一化操作
+        external_dict = data_IO.normalization(external_dict)
+        rake_extract_dict = data_IO.normalization(all_rake_dict[doc_id]) #当前文档的rake提取结果
+        all_merged_info.append([external_dict, rake_extract_dict])
+        print('第' + str(doc_id) + ' 个文档merge信息提取完毕')
 
     end_time = time.time()
     time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
@@ -329,6 +310,43 @@ def extract_all(all_merged_info, p):
     print('extract_all()耗时： ', str(time_used))
     return all_merged_kp
 
+# def evaluate_stem(topK_merged_kp, original_kp, stop_words):
+#     start_time = time.time()
+#     topK_merged_kp = evaluate.stemming(topK_merged_kp, stop_words)
+#     original_kp = evaluate.stemming(original_kp, stop_words)
+#     end_time = time.time()
+#     time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
+#     print('stemming()耗时： ', str(time_used))
+#
+#     precision = []
+#     recall = []
+#     # k可能小于标准关键术语个数
+#     doc_num = len(topK_merged_kp)
+#     for i in range(doc_num):
+#         print('关键术语topK: ' + str(topK_merged_kp[i]))
+#         print('原始关键术语：' + str(original_kp[i]))
+#         #  计算每一篇文档的p和r
+#     correct_num = 0
+#     for j in range(len(topK_merged_kp[0])):
+#         if original_kp[12].__contains__(topK_merged_kp[0][j]):
+#             correct_num += 1
+#     pi = correct_num / len(topK_merged_kp[0])
+#     ri = correct_num / len(original_kp[12])
+#     precision.append(pi)
+#     recall.append(ri)
+#     # 计算全部文档的平均p和r
+#     precision = np.array(precision)
+#     recall = np.array(recall)
+#     precision_avg = np.average(precision)
+#     recall_avg = np.average(recall)
+#     f = (2 * precision_avg * recall_avg) / (precision_avg + recall_avg)
+#
+#     end_time = time.time()
+#     time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
+#     print('evaluate_stem()耗时： ', str(time_used))
+#
+#     return precision_avg, recall_avg, f, precision, recall
+
 
 if __name__ == '__main__':
     doc2vec_dir = '../doc2vec/model.bin'
@@ -336,111 +354,68 @@ if __name__ == '__main__':
     file_path = 'doc_test.txt'
     file_path_json = 'rake_extract_keyphrase.json'
     vocab_dir = 'vocab_sg300d.txt'
-    merged_results_dir = 'all_merged_results.txt'
+    # merged_results_dir = 'all_merged_results.txt'
     # es_dir = 'process_es_search.txt'
     # evaluate dir：
-    evaluate_dir = '../evaluate_es_doc10w/'
-    topK_merged_dir = 'topK_merged_results.txt'
+    # evaluate_dir = '../evaluate_es_10w_doc2vec_eg1/'
+    # topK_merged_dir = 'topK_merged_results.txt'
     # precision_dir = 'precision.txt'
     # recall_dir = 'recall.txt'
     # avg_dir = 'avg.txt'
-    data_num = 100000
-    topN = 10  # 10篇相似文档
-    p_list = [0.2, 0.5, 0.6, 0.8]
-    k_list = [2, 4, 6]
+    # data_num = 100000
+    # topN = 10  # 10篇相似文档
+    # p_list = [0]
+    # k_list = [6]
     # p_list = [0.2]
     # k_list = [2]
     stop_words = data_IO.get_stopword()
-    print('加载词向量模型...')
-    word2vec_model = gensim.models.KeyedVectors.load_word2vec_format(fname=vector_dir, binary=False)
-    print('词向量模型加载完毕！')
-    # print('加载文档向量模型...')
-    # doc2vec_model = g.Doc2Vec.load(doc2vec_dir)
-    # print('文档向量模型加载完毕！')
+    # print('加载词向量模型...')
+    # word2vec_model = gensim.models.KeyedVectors.load_word2vec_format(fname=vector_dir, binary=False)
+    # print('词向量模型加载完毕！')
+    print('加载文档向量模型...')
+    doc2vec_model = g.Doc2Vec.load(doc2vec_dir)
+    print('文档向量模型加载完毕！')
 
 
     # prepare for data
     vocab = data_IO.load_vocab(vocab_dir)
-    abstract_str_list, all_doc_keywords = data_IO.load_json_data_for_es(file_path_json, data_num=data_num)  #读取10w条数据
-    print('abstract_str_list.len: ' + str(len(abstract_str_list)))
-    # abstract_str_list = data_IO.get_abstracts_str(file_path)
-    # es_results = get_es_results(abstract_str_list, top_n=50)
-    # data_IO.save_es_search_results(es_results,es_dir)
-    es_results = data_IO.load_all_temp_info('es_search.txt')
-    all_merged_info = get_all_merge_info(es_results, word2vec_model, vocab, topN)
-    data_IO.save_es_search_results(all_merged_info, '../merge_info/10w_merge_info_avg.txt')
-    # all_merged_info = get_all_merge_info_doc2vec(es_results, doc2vec_model, topN)
+    ids, docs, all_doc_keywords,all_rake_dict = data_IO.load_all_data_json4(file_path_json)  #全量
+    print('abstract_str_list.len: ' + str(len(all_doc_keywords)))
+
+    # all_merged_info = data_IO.load_all_temp_info('../merge_info/10w_merge_info.txt')
+    # print('merged_info加载完毕！')
+
+    print('目标文档====================')
+    print(docs[12])
+    print('原始关键词==================')
+    print(all_doc_keywords[12])
+    print('rake抽取的关键词=============')
+    print(all_rake_dict[12])
+
+    all_merged_info = get_all_merge_info_doc2vec(ids[12:13], all_doc_keywords, all_rake_dict[0:13],
+                                                 doc2vec_model, 10)
+
+
+    p = 0
+    k = 6
+    all_merged_kp = extract_all(all_merged_info, p)
+    topK_merged_kp = evaluate.get_topK_kp(all_merged_kp, k)
+    print('融合后的top6关键词==============')
+    print(topK_merged_kp)
     print(all_merged_info)
-    print('计算merge需要的信息完毕！')
+    keywords = all_doc_keywords[12:13]
+    precision_avg, recall_avg, f, precision, recall = evaluate.evaluate_stem(topK_merged_kp, keywords, stop_words)
+    print('precision: ',precision)
+    print('recall: ',recall)
+    print('平均检准率： ', precision_avg)
+    print('平均检全率： ', recall_avg)
+    print('F值： ', f)
 
-
-    # merge:
-    start_time = time.time()
-    avg_evaluate = {}
-
-    for p in p_list:
-        print('概率p为 ' + str(p) + ' 的结果：')
-        if not os.path.exists(evaluate_dir):
-            os.makedirs(evaluate_dir)
-        p_evaluate_dir = os.path.join(evaluate_dir, 'P' + str(p) + '/')
-        if not os.path.exists(p_evaluate_dir):
-            os.makedirs(p_evaluate_dir)
-
-        # 以参数p融合内外部关键词
-        all_merged_kp = extract_all(all_merged_info, p)
-
-        # print('内外部融合结果：')
-        # for i in range(len(all_merged_kp)):
-        #     print(sorted(all_merged_kp[i].items(), key=lambda d: d[1], reverse=True))
-        all_merged_dir = os.path.join(p_evaluate_dir, 'all_merged.txt')
-        evaluate.save_all_merged_results(all_merged_kp, all_merged_dir)
-
-        k_avg_evaluate = []
-        for k in k_list:
-            print('取前 ' + str(k) + ' 个关键术语的结果：')
-            # 文件夹k
-            p_k_evaluate_dir = os.path.join(p_evaluate_dir, 'top' + str(k) + '/')
-            if not os.path.exists(p_k_evaluate_dir):
-                os.makedirs(p_k_evaluate_dir)
-
-            # 取topK个关键词：
-            topK_merged_kp = evaluate.get_topK_kp(all_merged_kp, k)
-            p_k_merged_results_dir = os.path.join(p_k_evaluate_dir, 'top' + str(k) + '_phrases.txt')
-            evaluate.save_results(topK_merged_kp, p_k_merged_results_dir)
-
-            # evaluate: 结果stemming后进行评估
-            precision_avg, recall_avg, f, precision, recall = evaluate.evaluate_stem(topK_merged_kp, all_doc_keywords,
-                                                                                     stop_words)
-
-            precision_dir = os.path.join(p_k_evaluate_dir, 'precision_' + str(k) + '.txt')
-            recall_dir = os.path.join(p_k_evaluate_dir, 'recall_' + str(k) + '.txt')
-            evaluate.save_results(precision, precision_dir)
-            evaluate.save_results(recall, recall_dir)
-
-            k_avg_evaluate.append({k: [precision_avg, recall_avg, f]})
-            print('平均检准率： ', precision_avg)
-            print('平均检全率： ', recall_avg)
-            print('F值： ', f)
-
-        print('\n')
-        avg_evaluate.update({p: k_avg_evaluate})
-
-    avg_dir = os.path.join(evaluate_dir, 'eval_avg_es100.txt')
-    print(avg_dir)
-    with open(avg_dir, mode='w', encoding='utf-8')as wp:
-        for i in avg_evaluate:
-            wp.write('p='+str(i) + ': ' + str(avg_evaluate.get(i)) + '\n')
-        print('评估结果存储完毕！')
-
-
-    end_time = time.time()
-    time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
-    print('评估总体耗时： ', str(time_used))
-
-
+    # print('计算merge需要的信息完毕！')
     # # merge:
     # start_time = time.time()
     # avg_evaluate = {}
+    #
     # for p in p_list:
     #     print('概率p为 ' + str(p) + ' 的结果：')
     #     if not os.path.exists(evaluate_dir):
@@ -449,44 +424,54 @@ if __name__ == '__main__':
     #     if not os.path.exists(p_evaluate_dir):
     #         os.makedirs(p_evaluate_dir)
     #
+    #     # 以参数p融合内外部关键词
+    #     all_merged_kp = extract_all(all_merged_info, p)
     #     all_merged_dir = os.path.join(p_evaluate_dir, 'all_merged.txt')
-    #     all_merged_kp =extract_all_es(es_results, word2vec_model, vocab, topN, p)
-    #     # print('内外部融合结果：')
-    #     # for i in range(len(all_merged_kp)):
-    #     #     print(sorted(all_merged_kp[i].items(), key=lambda d: d[1], reverse=True))
     #     evaluate.save_all_merged_results(all_merged_kp, all_merged_dir)
     #
+    #     k_avg_evaluate = []
     #     for k in k_list:
-    #         k_avg_evaluate = {}
     #         print('取前 ' + str(k) + ' 个关键术语的结果：')
     #         # 文件夹k
     #         p_k_evaluate_dir = os.path.join(p_evaluate_dir, 'top' + str(k) + '/')
     #         if not os.path.exists(p_k_evaluate_dir):
     #             os.makedirs(p_k_evaluate_dir)
     #
-    #         p_k_merged_results_dir = os.path.join(p_k_evaluate_dir, 'top' + str(k) + '_phrases.txt')
+    #         # 取topK个关键词：
     #         topK_merged_kp = evaluate.get_topK_kp(all_merged_kp, k)
+    #         p_k_merged_results_dir = os.path.join(p_k_evaluate_dir, 'top' + str(k) + '_phrases.txt')
     #         evaluate.save_results(topK_merged_kp, p_k_merged_results_dir)
     #
-    #         # evaluate:
+    #         # evaluate: 结果stemming后进行评估
+    #         precision_avg, recall_avg, f, precision, recall = evaluate.evaluate_stem(topK_merged_kp, all_doc_keywords,
+    #                                                                                  stop_words)
+    #
     #         precision_dir = os.path.join(p_k_evaluate_dir, 'precision_' + str(k) + '.txt')
     #         recall_dir = os.path.join(p_k_evaluate_dir, 'recall_' + str(k) + '.txt')
-    #         precision_avg, recall_avg, f, precision, recall = evaluate.evaluate_stem(topK_merged_kp, all_doc_keywords, stop_words)
     #         evaluate.save_results(precision, precision_dir)
     #         evaluate.save_results(recall, recall_dir)
     #
-    #         k_avg_evaluate.update({k: [precision_avg, recall_avg, f]})
+    #         k_avg_evaluate.append({k: [precision_avg, recall_avg, f]})
     #         print('平均检准率： ', precision_avg)
     #         print('平均检全率： ', recall_avg)
     #         print('F值： ', f)
     #
-    #     avg_evaluate.update({p: k_avg_evaluate})
     #     print('\n')
-    # evaluate.save_results(avg_evaluate, avg_dir)
+    #     avg_evaluate.update({p: k_avg_evaluate})
+    #
+    # avg_dir = os.path.join(evaluate_dir, 'evaluate_avg_doc2vec.txt')
+    # print(avg_dir)
+    # with open(avg_dir, mode='w', encoding='utf-8')as wp:
+    #     for i in avg_evaluate:
+    #         wp.write('p='+str(i) + ': ' + str(avg_evaluate.get(i)) + '\n')
+    #     print('评估结果存储完毕！')
+    #
     #
     # end_time = time.time()
     # time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
-    # print('评估耗时： ', str(time_used))
+    # print('评估总体耗时： ', str(time_used))
+
+
 
 
 
