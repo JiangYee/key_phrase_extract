@@ -5,6 +5,7 @@ import codecs
 import numpy as np
 import nltk
 import time,datetime
+import pickle
 
 # 获取每篇文档的topK个融合的关键术语
 def get_topK_kp(all_merged_kp, k):
@@ -137,6 +138,42 @@ def evaluate_stem(topK_merged_kp, original_kp, stop_words):
     return precision_avg, recall_avg, f, precision, recall
 
 
+# 获取n篇文档的out of vocabulary
+def get_oov_list(kp_list, abstract_list, stop_words):
+    stemmer = nltk.stem.PorterStemmer()
+    kp_stem_lists = stemming(kp_list, stop_words) #n篇文档的所有kp
+    oov_lists = []
+    for abstract in abstract_list:
+        abs_spilt = abstract.split(' ')
+        abs_stem = stemmer.stem(abs_spilt[0])
+        for i in range(1, len(abs_spilt)):
+            if not stop_words.__contains__(abs_spilt[i]):
+                abs_stem = abs_stem + ' ' + stemmer.stem(abs_spilt[i])
+        # 统计未登录词个数
+        for kp_stem_list in kp_stem_lists: #一篇文档的关键词list
+            oov_list = []
+            for i in range(len(kp_stem_list)):
+                num = count_word_num(abs_stem, kp_stem_list[i])
+                if num == 0:
+                #  key:   未做stemming的关键词
+                    oov_list.append(kp_list[i])
+            oov_lists.append(oov_list)
+    return oov_lists
+
+
+# 统计一个字符串str中某个word出现的频次  
+def count_word_num(str, word):
+    num = 0
+    try:
+        num = len(str.split(word)) - 1
+        print('str=====', str)
+        print('word=====', word)
+    except (ValueError) as e:
+        print(e)
+        print('str=====',str)
+        print('word=====',word)
+    return num
+
 def save_results(result_array, save_path):
     # fp = open(file=save_dir, mode='w', encoding='utf-8')
     fp = codecs.open(filename=save_path, mode='w', encoding='utf-8')
@@ -153,4 +190,11 @@ def save_all_merged_results(result_list, save_dir):
         line = str(sorted(result_list[i].items(), key=lambda d: d[1], reverse=True))
         fp.write(line + '\n')
     fp.close()
+
+
+def save_results_pickle(result_array, save_path):
+    # fp = open(file=save_dir, mode='w', encoding='utf-8')
+    fw = open(save_path, 'wb')
+    pickle.dump(result_array, fw)
+    fw.close()
 
