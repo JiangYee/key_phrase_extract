@@ -143,20 +143,22 @@ def get_oov_list(kp_list, abstract_list, stop_words):
     stemmer = nltk.stem.PorterStemmer()
     kp_stem_lists = stemming(kp_list, stop_words) #n篇文档的所有kp
     oov_lists = []
+    abs_stem_list = []
     for abstract in abstract_list:
         abs_spilt = abstract.split(' ')
         abs_stem = stemmer.stem(abs_spilt[0])
         for i in range(1, len(abs_spilt)):
             if not stop_words.__contains__(abs_spilt[i]):
                 abs_stem = abs_stem + ' ' + stemmer.stem(abs_spilt[i])
+        abs_stem_list.append(abs_stem)
         # 统计未登录词个数
-        for kp_stem_list in kp_stem_lists: #一篇文档的关键词list
+        for i in kp_stem_lists: #kp_stem_list 一篇文档的关键词list
             oov_list = []
-            for i in range(len(kp_stem_list)):
-                num = count_word_num(abs_stem, kp_stem_list[i])
+            for j in range(len(kp_stem_lists[i])):
+                num = count_word_num(abs_stem[i], kp_stem_lists[i][j])
                 if num == 0:
                 #  key:   未做stemming的关键词
-                    oov_list.append(kp_list[i])
+                    oov_list.append(kp_list[i][j])
             oov_lists.append(oov_list)
     return oov_lists
 
@@ -166,8 +168,8 @@ def count_word_num(str, word):
     num = 0
     try:
         num = len(str.split(word)) - 1
-        print('str=====', str)
-        print('word=====', word)
+        # print('str=====', str)
+        # print('word=====', word)
     except (ValueError) as e:
         print(e)
         print('str=====',str)

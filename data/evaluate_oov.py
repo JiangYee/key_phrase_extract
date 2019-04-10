@@ -17,8 +17,8 @@ merged_10w = pickle.load(fr,encoding='utf-8')
 fr.close()
 
 # 计算oov的召回率时，先用get_oov_list,再调用evaluate_stem（oov_list，original_kp， stop_words
-kp_10w = all_doc_keywords[0:100000]
-abstrats_10w = abstrats[0:100000]
+kp_10w = all_doc_keywords[0:2]
+abstrats_10w = abstrats[0:2]
 oov_10w = []
 # for i in range(len(kp_10w)):
 #     oov_list = evaluate.get_oov_list(kp_10w[i],abstrats[i],stop_words)
