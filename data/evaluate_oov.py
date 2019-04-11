@@ -3,6 +3,7 @@
 import pickle
 from data import data_IO
 from data import evaluate
+import random
 
 recall_dir = 'oov_recall.txt'
 file_path_json = 'rake_extract_keyphrase.json'
@@ -17,14 +18,36 @@ merged_10w = pickle.load(fr,encoding='utf-8')
 fr.close()
 
 # 计算oov的召回率时，先用get_oov_list,再调用evaluate_stem（oov_list，original_kp， stop_words
-kp_10w = all_doc_keywords[0:2]
-abstrats_10w = abstrats[0:2]
-oov_10w = []
+num = 0
+id_list = []
+merged_2w = []
+kp_2w = []
+abstrats_2w = []
+id = random.randint(0,100000)
+id_list.append(id)
+while num < 20000:
+    id = random.randint(0, 99999)
+    if not id_list.__contains__(id):
+        id_list.append(id)
+        merged_2w.append(merged_10w[id])
+        kp_2w.append(all_doc_keywords[id])
+        abstrats_2w.append(abstrats[id])
+        num += 1
+
+# merged_2w = merged_10w[0:20000]
+# kp_2w = all_doc_keywords[0:20000]
+# abstrats_2w = abstrats[0:20000]
+print('merged_2w:', len(merged_2w))
+print('kp_2w:', len(kp_2w))
+print('abstrats_2w:',len(abstrats_2w))
+
+# oov_10w = []
+oov_2w = evaluate.get_oov_list(kp_2w,abstrats_2w,stop_words)
+print('oov_2w:', len(oov_2w))
 # for i in range(len(kp_10w)):
 #     oov_list = evaluate.get_oov_list(kp_10w[i],abstrats[i],stop_words)
 #     oov_10w.append(oov_list)
-oov_10w = evaluate.get_oov_list(kp_10w,abstrats_10w,stop_words)
-precision_avg, recall_avg, f, precision, recall = evaluate.evaluate_stem(merged_10w,oov_10w,stop_words)
+recall_avg, recall = evaluate.evaluate_oov_recall(merged_2w,oov_2w,stop_words)
 
 evaluate.save_results(recall, recall_dir)
 print('oov的recall：',recall_avg)

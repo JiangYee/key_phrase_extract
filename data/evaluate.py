@@ -138,6 +138,39 @@ def evaluate_stem(topK_merged_kp, original_kp, stop_words):
     return precision_avg, recall_avg, f, precision, recall
 
 
+def evaluate_oov_recall(topK_merged_kp, oov_kp, stop_words):
+    start_time = time.time()
+    topK_merged_kp = stemming(topK_merged_kp, stop_words)
+    oov_kp = stemming(oov_kp, stop_words)
+    end_time = time.time()
+    time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
+    print('stemming()耗时： ', str(time_used))
+
+    recall = []
+    # k可能小于标准关键术语个数
+    doc_num = len(topK_merged_kp)
+    for i in range(doc_num):
+        # print('关键术语topK: ' + str(topK_merged_kp[i]))
+        # print('原始关键术语：' + str(original_kp[i]))
+        #  计算每一篇文档的p和r
+        if len(oov_kp[i]) != 0:
+            correct_num = 0
+            for j in range(len(topK_merged_kp[i])):
+                if oov_kp[i].__contains__(topK_merged_kp[i][j]):
+                    correct_num += 1
+            ri = correct_num / len(oov_kp[i])
+            recall.append(ri)
+    # 计算全部文档的平均p和r
+    recall = np.array(recall)
+    recall_avg = np.average(recall)
+
+    end_time = time.time()
+    time_used = datetime.timedelta(seconds=int(round(end_time - start_time)))
+    print('evaluate_stem()耗时： ', str(time_used))
+
+    return recall_avg, recall
+
+
 # 获取n篇文档的out of vocabulary
 def get_oov_list(kp_list, abstract_list, stop_words):
     stemmer = nltk.stem.PorterStemmer()
@@ -151,29 +184,31 @@ def get_oov_list(kp_list, abstract_list, stop_words):
             if not stop_words.__contains__(abs_spilt[i]):
                 abs_stem = abs_stem + ' ' + stemmer.stem(abs_spilt[i])
         abs_stem_list.append(abs_stem)
-        # 统计未登录词个数
-        for i in kp_stem_lists: #kp_stem_list 一篇文档的关键词list
-            oov_list = []
-            for j in range(len(kp_stem_lists[i])):
-                num = count_word_num(abs_stem[i], kp_stem_lists[i][j])
+
+    # 统计未登录词
+    for i in range(len(kp_stem_lists)): #kp_stem_list 一篇文档的关键词list
+        oov_list = []
+        abs = abs_stem_list[i]
+        for j in range(len(kp_stem_lists[i])):# kp_stem_lists[i] 可能是['strong cover properti', 'real', '', '', 'msc (2010) 03e35']
+            kp = kp_stem_lists[i][j]   # kp 可能是''
+            try:
+                num = count_word_num(abs, kp)
                 if num == 0:
-                #  key:   未做stemming的关键词
+                    #  key:   未做stemming的关键词
                     oov_list.append(kp_list[i][j])
-            oov_lists.append(oov_list)
+            except (Exception) as e:
+                print(e)
+                print(j)
+                print(kp_list[i])
+                print(kp_stem_lists[i])
+                print(abs)
+        oov_lists.append(oov_list)
     return oov_lists
 
 
 # 统计一个字符串str中某个word出现的频次  
 def count_word_num(str, word):
-    num = 0
-    try:
-        num = len(str.split(word)) - 1
-        # print('str=====', str)
-        # print('word=====', word)
-    except (ValueError) as e:
-        print(e)
-        print('str=====',str)
-        print('word=====',word)
+    num = len(str.split(word)) - 1
     return num
 
 def save_results(result_array, save_path):
