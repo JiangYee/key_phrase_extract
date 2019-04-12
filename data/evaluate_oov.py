@@ -23,7 +23,7 @@ id_list = []
 merged_2w = []
 kp_2w = []
 abstrats_2w = []
-id = random.randint(0,100000)
+id = random.randint(0, 99999)
 id_list.append(id)
 while num < 20000:
     id = random.randint(0, 99999)
