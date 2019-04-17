@@ -134,74 +134,7 @@ def count_n_kw_len(keyword_lists):
     return n_kw_len
 
 
-# 获取单文本的n_gram
-def n_gram(text,n):
-    tokenzer = WordPunctTokenizer()
-    text = tokenzer.tokenize(text)
-    n_grams = ngrams(text,n)
-    return n_grams
 
-
-# 获取n篇摘要的n_gram
-def get_n_gram_list(abs_list, n):
-    return [n_gram(abs) for abs in abs_list]
-
-
-# 统计词频
-def count_tf(n_grams):
-    fdist = FreqDist(n_grams)
-
-
-
-# 构造tf-idf corpus (word为单位)
-def get_corpus_word(all_doc):
-    tokenzer = WordPunctTokenizer()
-    all_doc = [tokenzer.tokenize(doc) for doc in all_doc]  # 对所有摘要分词
-    corpus = TextCollection(all_doc)
-    return corpus
-
-# # 构造tf-idf corpus (n_gram为单位)
-# def get_corpus_ngram(n_grams):
-#     n_gram_list = [n_gram for n_gram in n_grams]
-#     return TextCollection(n_gram_list)
-
-
-# 计算一篇摘要的所有词的tf-idf (以word为单位)
-def tf_idf_abs(abstract, corpus):
-    tokenzer = WordPunctTokenizer()
-    abstract = tokenzer.tokenize(abs)  # 对摘要分词
-    tf_idf_list = []
-    for word in abstract:
-        tf_idf = corpus.tf_idf(word,corpus)
-        tf_idf_list.append(tf_idf)
-    return tf_idf_list
-
-
-# 计算n篇摘要的所有词的tf-idf (以word为单位)
-def tf_idf_abs_all(all_abstract, corpus):
-    all_tf_idf = []
-    tokenzer = WordPunctTokenizer()
-    all_abstract = [tokenzer.tokenize(abs) for abs in all_abstract]  # 对所有摘要分词
-    for abs in all_abstract:
-        tf_idf_list = []
-        for word in abs:
-            # tf = corpus.tf(word,corpus)
-            # idf = corpus.idf(word)
-            tf_idf = corpus.tf_idf(word,corpus)
-            # print(word,': tf=',tf,' idf=',idf,' tf-idf=',tf_idf)
-            tf_idf_list.append(tf_idf)
-        # all_tf_idf.append([abs,tf_idf_list])
-        all_tf_idf.append(tf_idf_list)
-    return all_tf_idf
-
-
-# 统计一篇文档的关键词(整个词组)的tf—idf corpus以word为单位
-def tf_idf_kw(keywords, corpus):
-    tf_idf_dict = {}
-    for kw in keywords:
-        tf_idf = corpus.tf_idf(kw,corpus)
-        tf_idf_dict.update({kw : tf_idf})
-    return tf_idf_dict
 
 
 

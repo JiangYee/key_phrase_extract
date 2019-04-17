@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
 from nltk import ngrams
-from static_count import preprocess, count
+from static_count import preprocess, count,tf_idf
 
 json_file = '../data/test_json'
 # json_file = '../data/all_title_abstract_keyword_clean.json'
@@ -57,23 +57,22 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 
 # 计算tf-idf
 # word为单位：
-corpus0 = count.get_corpus_word(abstract_list)
-all_tf_idf = count.tf_idf_abs_all(abstract_list,corpus0)
-data_tf_idf = DataFrame(all_tf_idf)
+# corpus0 = count.get_corpus_word(abstract_list)
+# all_tf_idf = count.tf_idf_abs_all(abstract_list,corpus0)
+# data_tf_idf = DataFrame(all_tf_idf)
 # data_tf_idf = DataFrame(np.array(all_tf_idf)[:,1])
-DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
+# DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
 # 关键词的tf-idf
 # tf_idf_kw = count.tf_idf_kw(keyword_list[0], corpus0)
 # print(tf_idf_kw)
 
 # 以n_gram为单位：
-# n_grams = count.n_gram(abstract_list[0],2)
-# corpus = count.get_corpus_ngram(n_grams) #只是单篇的n_gram？？？
-# all_tf_idf = count.tf_idf_abs_all(abstract_list,corpus)
-# data_tf_idf = DataFrame(all_tf_idf)
-# DataFrame(data_tf_idf).to_excel('tf-idf_ngram.xlsx')
-# print(corpus.tf_idf('this paper',corpus))
-
+# n_grams = tf_idf.n_gram(abstract_list[0],2)
+# abs_n_gram_lsit = tf_idf.get_n_gram_list(abstract_list,2)
+# tfidf1 = tf_idf.tf_idf_abs_n_gram(n_grams,abs_n_gram_lsit)
+# data_tf_idf = DataFrame({'2-gram': n_grams, 'tf-idf':tfidf1})
+# DataFrame(data_tf_idf).to_excel('tf-idf_2gram.xlsx')
+# print(tfidf1)
 
 # 统计关键词长度
 # kw_len= count.count_kw_len(keyword_list[4])
@@ -81,8 +80,9 @@ DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
 # print(np.average(kw_len))
 #
 n_kw_len = count.count_n_kw_len(keyword_list)
+# data=DataFrame({'keyword': keyword_list, 'len':n_kw_len})
 data=DataFrame(n_kw_len)
-DataFrame(data).to_excel('len.xlsx')
+DataFrame(data).to_excel('len0.xlsx')
 
 # print(n_kw_len)
 # avgs = [np.average(kw_len) for kw_len in n_kw_len]
@@ -94,5 +94,5 @@ DataFrame(data).to_excel('len.xlsx')
 
 # n_grams = count.n_gram(abstract_list[0],2)
 # for gram in n_grams:
-#     if 'application' in gram:
+#     if 'application' in gram:  # keyword中的word存在于n_gram中
 #         print(gram)
