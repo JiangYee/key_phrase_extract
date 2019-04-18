@@ -3,7 +3,7 @@
 import json
 import nltk
 from nltk.tokenize import WordPunctTokenizer
-import re
+import pickle
 
 def load_json(path):
     with open(path, 'r', encoding='utf8') as fin:
@@ -52,3 +52,16 @@ def stemming_list(str, split_token):
         stem_list.append(word_stem)
     return stem_list
 
+
+def read(data_path):
+    fr = open(data_path,'rb')
+    data = pickle.load(fr)
+    fr.close()
+    return data
+
+
+def save(data, save_path):
+    # fp = open(file=save_dir, mode='w', encoding='utf-8')
+    fw = open(save_path, 'wb')
+    pickle.dump(data, fw)
+    fw.close()

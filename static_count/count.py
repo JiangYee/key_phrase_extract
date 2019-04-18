@@ -118,13 +118,18 @@ def cal_in_out_avg(count_results):
 # ====================================================
 # 统计一篇文档的关键词长度
 # return length array
+# def count_kw_len(keyword_list):
+#     tokenzer = WordPunctTokenizer()
+#     len_kw = []
+#     for keyword in keyword_list:
+#         kw_words = tokenzer.tokenize(keyword)
+#         len_kw.append(len(kw_words))
+#     len_kw = np.array(len_kw)
+#     return len_kw
+
 def count_kw_len(keyword_list):
     tokenzer = WordPunctTokenizer()
-    len_kw = []
-    for keyword in keyword_list:
-        kw_words = tokenzer.tokenize(keyword)
-        len_kw.append(len(kw_words))
-    len_kw = np.array(len_kw)
+    len_kw = [len(tokenzer.tokenize(keyword)) for keyword in keyword_list]
     return len_kw
 
 
@@ -132,6 +137,19 @@ def count_kw_len(keyword_list):
 def count_n_kw_len(keyword_lists):
     n_kw_len = [count_kw_len(keyword_list) for keyword_list in keyword_lists]
     return n_kw_len
+
+def flatten_len(n_kw_len):
+    flatten =[]
+    for kw_len in n_kw_len:
+        flatten = np.concatenate([flatten,kw_len])
+    return flatten
+
+
+def count_n_kw_len_dict(keyword_lists):
+    n_kw_len_dict = {}
+    for i in range(len(keyword_lists)):
+        n_kw_len_dict.update({i: count_kw_len(keyword_lists[i])})
+    return n_kw_len_dict
 
 
 

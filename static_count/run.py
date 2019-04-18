@@ -80,9 +80,17 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(np.average(kw_len))
 #
 n_kw_len = count.count_n_kw_len(keyword_list)
+# flatten = []
+# for kw_len in n_kw_len:
+#     flatten = np.concatenate([flatten,kw_len])
+flatten =count.flatten_len(n_kw_len)
+print(flatten)
+preprocess.save(flatten,'flatten_len')
+
+# preprocess.save(n_kw_len,'len')
 # data=DataFrame({'keyword': keyword_list, 'len':n_kw_len})
-data=DataFrame(n_kw_len)
-DataFrame(data).to_excel('len0.xlsx')
+# data=DataFrame(n_kw_len)
+# DataFrame(data).to_excel('len0.xlsx')
 
 # print(n_kw_len)
 # avgs = [np.average(kw_len) for kw_len in n_kw_len]
