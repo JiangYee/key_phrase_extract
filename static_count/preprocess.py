@@ -4,6 +4,7 @@ import json
 import nltk
 from nltk.tokenize import WordPunctTokenizer
 import pickle
+import pandas as pd
 
 def load_json(path):
     with open(path, 'r', encoding='utf8') as fin:
@@ -52,16 +53,23 @@ def stemming_list(str, split_token):
         stem_list.append(word_stem)
     return stem_list
 
-
+# pickle读取数据
 def read(data_path):
     fr = open(data_path,'rb')
     data = pickle.load(fr)
     fr.close()
     return data
 
-
+# pickle存储数据
 def save(data, save_path):
     # fp = open(file=save_dir, mode='w', encoding='utf-8')
     fw = open(save_path, 'wb')
     pickle.dump(data, fw)
     fw.close()
+
+# 读取存放在excel中的in or not数据（作图）
+def read_excel_count(data_path):
+    df = pd.read_excel(data_path, usecols=[1, 2], header=0)
+    in_data = df.get('in')
+    out_data = df.get('out')
+    return [in_data, out_data]
