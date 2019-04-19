@@ -29,7 +29,7 @@ def get_info(json_obj):
     return abstract_list, keyword_list, title_list
 
 
-# stemming for a string (not remove stopwords)
+# stemming for a string, use str.split()  (not remove stopwords)
 # return: string
 def stemming_str(str, split_token):
     # str = re.sub(r'[’!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~]+]', '', str) #去掉标点
@@ -41,9 +41,22 @@ def stemming_str(str, split_token):
         str_stem = str_stem + ' ' + term_stem
     return str_stem.strip()
 
-# stemming for a string (not remove stopwords)
+
+# stemming for a string, use str.split() (not remove stopwords)
 # return: list
 def stemming_list(str, split_token):
+    stem_list = []
+    stemmer = nltk.stem.PorterStemmer()
+    words = str.split(split_token)
+    for word in words:
+        word_stem = stemmer.stem(word)
+        stem_list.append(word_stem)
+    return stem_list
+
+
+# stemming for a string, use tokenizer() (not remove stopwords)
+# return: list
+def stemming_tokenizer(str):
     stem_list = []
     stemmer = nltk.stem.PorterStemmer()
     tokenzer = WordPunctTokenizer()
@@ -52,6 +65,7 @@ def stemming_list(str, split_token):
         word_stem = stemmer.stem(word)
         stem_list.append(word_stem)
     return stem_list
+
 
 # pickle读取数据
 def read(data_path):

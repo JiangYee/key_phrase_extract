@@ -10,11 +10,14 @@ from nltk.tokenize import  word_tokenize
 import numpy as np
 from static_count import preprocess
 
+
+# abstract: tokenzer.tokenize(abstract)
+# keyphrase: keyphrase.split(' ')
 # 统计单篇文档的关键词(整个词组)在摘要中出现/未出现的个数 keyword(stemming)
 def count_in_stem(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    abs_stem = preprocess.stemming_list(abstract, ' ')
+    abs_stem = preprocess.stemming_tokenizer(abstract)
     # print(abs_stem)
 
     for keyword in keyword_list:
@@ -49,7 +52,7 @@ def count_in(abstract, keyword_list):
 def count_part_in_stem(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    abs_stem = preprocess.stemming_list(abstract, ' ')
+    abs_stem = preprocess.stemming_tokenizer(abstract)
     # print(abs_stem)
 
     for keyword in keyword_list:
@@ -73,7 +76,7 @@ def count_part_in(abstract, keyword_list):
     # print(abs_words)
 
     for keyword in keyword_list:
-        kd_words = tokenzer.tokenize(keyword)
+        kd_words = keyword.split(' ')
         for word in kd_words:
             if word in abs_words:
                 in_num += 1
