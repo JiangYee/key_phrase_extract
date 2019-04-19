@@ -53,6 +53,8 @@ if __name__ == '__main__':
     # print(tfidf(('This', 'paper'),count,[count0,count]))
     n_grams = tf_idf.n_gram(abstract_list[0],2)
     abs_n_gram_lsit = tf_idf.get_n_gram_list(abstract_list,2)
+    corpus = TextCollection(abs_n_gram_lsit)
+    print(corpus.tf_idf(('This', 'paper'),corpus))
     tfidf1 = tf_idf.tf_idf_abs_n_gram(n_grams,abs_n_gram_lsit)
     print(tfidf1)
 
