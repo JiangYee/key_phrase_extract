@@ -16,52 +16,52 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(len(keyword_list))
 
 
-# 统计关键词in or not in
-count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=False)
-in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
-count_dict = {'in':in_num_list,'out':out_num_list}
-print(count_results)
-print(avg_in,avg_out)
+# # 统计关键词in or not in
+# count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=False)
+# in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
+# count_dict = {'in':in_num_list,'out':out_num_list}
+# print(count_results)
+# print(avg_in,avg_out)
+# #
+# data=DataFrame(count_dict)  #将字典转换成为数据框
+# DataFrame(data).to_excel('count_ff1.xlsx')
+# print('count_ff1 over!')
 #
-data=DataFrame(count_dict)  #将字典转换成为数据框
-DataFrame(data).to_excel('count_ff1.xlsx')
-print('count_ff1 over!')
-
-count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=True)
-in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
-count_dict = {'in':in_num_list,'out':out_num_list}
-print(count_results)
-print(avg_in,avg_out)
+# count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=True)
+# in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
+# count_dict = {'in':in_num_list,'out':out_num_list}
+# print(count_results)
+# print(avg_in,avg_out)
+# #
+# data=DataFrame(count_dict)  #将字典转换成为数据框
+# DataFrame(data).to_excel('count_ft1.xlsx')
+# print('count_ft1 over!')
 #
-data=DataFrame(count_dict)  #将字典转换成为数据框
-DataFrame(data).to_excel('count_ft1.xlsx')
-print('count_ft1 over!')
-
-count_results = count.count_in_all(abstract_list, keyword_list, isPart=True,isStem=False)
-in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
-count_dict = {'in':in_num_list,'out':out_num_list}
-print(count_results)
-print(avg_in,avg_out)
+# count_results = count.count_in_all(abstract_list, keyword_list, isPart=True,isStem=False)
+# in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
+# count_dict = {'in':in_num_list,'out':out_num_list}
+# print(count_results)
+# print(avg_in,avg_out)
+# #
+# data=DataFrame(count_dict)  #将字典转换成为数据框
+# DataFrame(data).to_excel('count_tf1.xlsx')
+# print('count_tf1 over!')
 #
-data=DataFrame(count_dict)  #将字典转换成为数据框
-DataFrame(data).to_excel('count_tf1.xlsx')
-print('count_tf1 over!')
-
-count_results = count.count_in_all(abstract_list, keyword_list, isPart=True,isStem=True)
-in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
-count_dict = {'in':in_num_list,'out':out_num_list}
-print(count_results)
-print(avg_in,avg_out)
-#
-data=DataFrame(count_dict)  #将字典转换成为数据框
-DataFrame(data).to_excel('count_tt1.xlsx')
-print('count_tt1 over!')
+# count_results = count.count_in_all(abstract_list, keyword_list, isPart=True,isStem=True)
+# in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
+# count_dict = {'in':in_num_list,'out':out_num_list}
+# print(count_results)
+# print(avg_in,avg_out)
+# #
+# data=DataFrame(count_dict)  #将字典转换成为数据框
+# DataFrame(data).to_excel('count_tt1.xlsx')
+# print('count_tt1 over!')
 
 
 # 计算tf-idf
 # word为单位：
-corpus0 = tf_idf.get_corpus_word(abstract_list)
-all_tf_idf = tf_idf.tf_idf_abs_all(abstract_list,corpus0)
+# corpus0 = tf_idf.get_corpus_word(abstract_list)
+# all_tf_idf = tf_idf.tf_idf_abs_all(abstract_list,corpus0)
 
 # data_tf_idf = DataFrame(all_tf_idf)
 # data_tf_idf = DataFrame(np.array(all_tf_idf)[:,1])
@@ -86,10 +86,12 @@ all_tf_idf = tf_idf.tf_idf_abs_all(abstract_list,corpus0)
 # print(keyword_list[4])
 # print(np.average(kw_len))
 #
-n_kw_len = count.count_n_kw_len(keyword_list)
+# print('统计关键词长度......')
+# n_kw_len = count.count_n_kw_len(keyword_list)
+# print('exp_num', exp_num)
 # flatten =count.flatten_len(n_kw_len)
-# print(flatten)
-# preprocess.save(flatten,'flatten_len5')
+# print(len(flatten))
+# preprocess.save(flatten,'flatten_len_tokenize')
 # data=DataFrame(flatten)
 # DataFrame(data).to_excel('flatten_len5.xlsx')
 

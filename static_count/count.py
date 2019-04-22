@@ -136,27 +136,45 @@ def in_out_persents(excel_dir):
 
     return [in_persents,out_persents]
 
+
 # ====================================================
 # 统计一篇文档的关键词长度
 # return length array
 def count_kw_len(keyword_list):
-    # tokenzer = WordPunctTokenizer()
+    tokenzer = WordPunctTokenizer()
     len_kw = []
     for keyword in keyword_list:
-        # kw_words = tokenzer.tokenize(keyword)
-        kw_words = keyword.split(' ')
-        if len(kw_words)> 5:
-            print(len(kw_words), kw_words)
-            continue
+        kw_words = tokenzer.tokenize(keyword)
+        # kw_words = keyword.split(' ')
+        # if len(kw_words)> 5:
+        #     print(len(kw_words), kw_words)
+        #     continue
         len_kw.append(len(kw_words))
     len_kw = np.array(len_kw)
 
     return len_kw
 
 
+# 统计长度的同时，统计异常数据量
 # def count_kw_len(keyword_list):
 #     tokenzer = WordPunctTokenizer()
-#     len_kw = [len(tokenzer.tokenize(keyword)) for keyword in keyword_list]
+#     len_kw = []
+#     exception_num = 0
+#     for keyword in keyword_list:
+#         kw_words = tokenzer.tokenize(keyword)
+#         if "-" in kw_words:
+#             print(kw_words)
+#             exception_num += 1
+#         len_kw.append(len(kw_words))
+#     len_kw = np.array(len_kw)
+#
+#     return len_kw, exception_num
+
+
+
+# def count_kw_len(keyword_list):
+#     tokenzer = WordPunctTokenizer()
+#     len_kw = [len3(tokenzer.tokenize(keyword)) for keyword in keyword_list]
 #
 #     for i in range(len(len_kw)):
 #         if len_kw[i] > 10:
@@ -170,6 +188,13 @@ def count_kw_len(keyword_list):
 def count_n_kw_len(keyword_lists):
     n_kw_len = [count_kw_len(keyword_list) for keyword_list in keyword_lists]
     return n_kw_len
+    # n_kw_len = []
+    # exp_sum = 0
+    # for keyword_list in keyword_lists:
+    #     kw_len, exception_num = count_kw_len(keyword_list)
+    #     exp_sum += exception_num
+    #     n_kw_len.append(kw_len)
+    # return n_kw_len, exp_sum
 
 
 def flatten_len(n_kw_len):

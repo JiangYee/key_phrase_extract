@@ -47,13 +47,26 @@ if __name__ == "__main__":
     # in_persents = [num for num in in_out_persents[0] if num < 4]
 
     # len（pickle）
-    print(len(preprocess.read('flatten_len')))
-    len_dir= 'flatten_len10'
-    len_data = preprocess.read(len_dir)
-    print(len(len_data))
-    len_data = [data for data in len_data if data < 6]
-    print(len(len_data))
-    print(max(len_data))
+    flatten_len_tokenize = preprocess.read('../static_count/count_data/flatten_len_tokenize')
+    print(len(flatten_len_tokenize))
+    count_10 = 0
+    count_5 = 0
+    for len_kw in flatten_len_tokenize:
+        if len_kw <= 10 :
+            count_10 += 1
+        if len_kw <= 5:
+            count_5 += 1
+    print(count_10)
+    print(count_5)
+    print(len(preprocess.read('../static_count/count_data/flatten_len')))
+    print(len(preprocess.read('../static_count/count_data/flatten_len10')))
+    print(len(preprocess.read('../static_count/count_data/flatten_len5')))
+    # len_dir= 'flatten_len10'
+    # len_data = preprocess.read(len_dir)
+    # print(len(len_data))
+    # len_data = [data for data in len_data if data < 6]
+    # print(len(len_data))
+    # print(max(len_data))
 
     # json_file = '../data/test_json'
     # json_obj = preprocess.load_json(json_file)
