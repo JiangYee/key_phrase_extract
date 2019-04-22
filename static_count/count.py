@@ -211,7 +211,16 @@ def count_n_kw_len_dict(keyword_lists):
     return n_kw_len_dict
 
 
+# 统计list中各数据所占的比例
+def get_percentage(count_list):
+    count_set = set(count_list)
+    total_num = len(count_list)
+    persents = {}
 
+    for num in count_set:
+        persent = count_list.count(num) / total_num
+        persents.update({num: persent})
+    return persents
 
 
 

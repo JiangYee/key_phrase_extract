@@ -47,20 +47,33 @@ if __name__ == "__main__":
     # in_persents = [num for num in in_out_persents[0] if num < 4]
 
     # len（pickle）
-    flatten_len_tokenize = preprocess.read('../static_count/count_data/flatten_len_tokenize')
-    print(len(flatten_len_tokenize))
-    count_10 = 0
-    count_5 = 0
-    for len_kw in flatten_len_tokenize:
-        if len_kw <= 10 :
-            count_10 += 1
-        if len_kw <= 5:
-            count_5 += 1
-    print(count_10)
-    print(count_5)
-    print(len(preprocess.read('../static_count/count_data/flatten_len')))
-    print(len(preprocess.read('../static_count/count_data/flatten_len10')))
-    print(len(preprocess.read('../static_count/count_data/flatten_len5')))
+    flatten_len_tokenize = preprocess.read('flatten_len10')
+    test = flatten_len_tokenize[0:10].tolist()
+    print(test)
+    persents_dict = count.get_percentage(test)
+    print(persents_dict)
+
+    labels = 'A', 'B', 'C'
+    fracs = [0.3, 0.5, 0.2]
+    explode = [0, 0, 0]  # 0.1 凸出这部分，
+    plt.axes(aspect=1)  # set this , Figure is round, otherwise it is an ellipse
+    # autopct ，show percet
+    plt.pie(x=fracs, labels=labels, explode=explode, autopct='%3.1f %%',
+            shadow=True, labeldistance=1.1, startangle=90, pctdistance=0.6)
+    plt.show()
+    # print(len(flatten_len_tokenize))
+    # count_10 = 0
+    # count_5 = 0
+    # for len_kw in flatten_len_tokenize:
+    #     if len_kw <= 10 :
+    #         count_10 += 1
+    #     if len_kw <= 5:
+    #         count_5 += 1
+    # print(count_10)
+    # print(count_5)
+    # print(len(preprocess.read('../static_count/count_data/flatten_len')))
+    # print(len(preprocess.read('../static_count/count_data/flatten_len10')))
+    # print(len(preprocess.read('../static_count/count_data/flatten_len5')))
     # len_dir= 'flatten_len10'
     # len_data = preprocess.read(len_dir)
     # print(len(len_data))
