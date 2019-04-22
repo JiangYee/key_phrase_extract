@@ -218,8 +218,8 @@ def get_percentage(count_list):
     persents = {}
 
     for num in count_set:
-        persent = count_list.count(num) / total_num
-        persents.update({num: persent})
+        percent = count_list.count(num) / total_num
+        persents.update({num: percent})
     return persents
 
 

@@ -47,8 +47,8 @@ if __name__ == "__main__":
     # in_persents = [num for num in in_out_persents[0] if num < 4]
 
     # len（pickle）
-    flatten_len_tokenize = preprocess.read('flatten_len10')
-    test = flatten_len_tokenize[0:10].tolist()
+    flatten_len_tokenize = preprocess.read('persents_len')
+    test = flatten_len_tokenize.tolist()
     print(test)
     persents_dict = count.get_percentage(test)
     print(persents_dict)

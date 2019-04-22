@@ -95,6 +95,14 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # data=DataFrame(flatten)
 # DataFrame(data).to_excel('flatten_len5.xlsx')
 
+# 统计百分比
+print('统计百分比...')
+flatten_len_tokenize = preprocess.read('./count_data/flatten_len').tolist()
+persents_dict = count.get_percentage(flatten_len_tokenize)
+preprocess.save(persents_dict, 'persents_len')
+data=DataFrame({'length':persents_dict.keys(), 'percent':persents_dict.values()})
+DataFrame(data).to_excel('persents_len.xlsx')
+
 # preprocess.save(n_kw_len,'len')
 # data=DataFrame({'keyword': keyword_list, 'len':n_kw_len})
 # data=DataFrame(n_kw_len)
