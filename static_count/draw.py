@@ -23,16 +23,37 @@ def draw(data, title, x_name, y_name, x_ticks,  x_ticklabels):
     plt.show()
 
 
+def draw_violin(data, title, x_name, y_name, x_ticks,  x_ticklabels):
+    # plt.boxplot(data,
+    #             notch=False,  # box instead of notch shape
+    #             sym='rs',  # red squares for outliers
+    #             vert=True)  # vertical box aligmnent
+    plt.grid()
+    plt.violinplot(data, showmeans=False, showmedians=True)
+    plt.xticks(x_ticks, x_ticklabels)
+    plt.ylabel(y_name)
+    plt.title(title)
+    plt.show()
+
 if __name__ == "__main__":
 
     # # load data
     # # count in/out excel数据
-    # in_out_dir = './resulte_data/count_ff.xlsx'
+    # in_out_dir = './resulte_data/count_ft1.xlsx'
     # in_out_data = preprocess.read_excel_count(in_out_dir)
 
+    # count_in_out_persents
+    # in_out_persents = count.in_out_persents(in_out_dir)
+    # in_persents = [num for num in in_out_persents[0] if num < 4]
+
     # len（pickle）
-    len_dir= './resulte_data/len'
+    print(len(preprocess.read('flatten_len')))
+    len_dir= 'flatten_len10'
     len_data = preprocess.read(len_dir)
+    print(len(len_data))
+    len_data = [data for data in len_data if data < 6]
+    print(len(len_data))
+    print(max(len_data))
 
     # json_file = '../data/test_json'
     # json_obj = preprocess.load_json(json_file)
@@ -43,5 +64,8 @@ if __name__ == "__main__":
     #
     # all_data = [in_num_list,out_num_list]
 
-    draw(len_data, 'test_in_out','x','num of keywords',[1,2],['in','out'])
+    # draw(in_out_data, 'in_out_ft','x','num of keywords',[1,2],['in','out'])
+    # draw(in_out_persents, 'in_out_persents_tt','','persents',[1,2],['in','out'])
+    # draw_violin(in_out_persents[0],'violin plot: in_persents_ft','','persents',[1],['in'])
+    # draw(len_data, 'length of keyphrase','x','length of keyphrase',[1],['x1'])
 

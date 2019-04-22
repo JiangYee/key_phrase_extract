@@ -118,6 +118,24 @@ def cal_in_out_avg(count_results):
     return in_num_list, out_num_list, avg_in, avg_out
 
 
+def in_out_persents(excel_dir):
+    in_out_data = preprocess.read_excel_count(excel_dir)
+    in_data = np.array(in_out_data[0])
+    out_data = np.array(in_out_data[1])
+    total_data = in_data + out_data
+    in_persents = []
+    out_persents = []
+    for i in range(len(in_data)):
+        in_num = in_data[i]
+        out_num = out_data[i]
+        total = total_data[i]
+        in_persent = in_num / total
+        out_persent = out_num / total
+        in_persents.append(in_persent)
+        out_persents.append(out_persent)
+
+    return [in_persents,out_persents]
+
 # ====================================================
 # 统计一篇文档的关键词长度
 # return length array

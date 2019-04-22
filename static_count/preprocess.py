@@ -5,6 +5,7 @@ import nltk
 from nltk.tokenize import WordPunctTokenizer
 import pickle
 import pandas as pd
+import numpy as np
 
 def load_json(path):
     with open(path, 'r', encoding='utf8') as fin:
@@ -87,3 +88,18 @@ def read_excel_count(data_path):
     in_data = df.get('in')
     out_data = df.get('out')
     return [in_data, out_data]
+
+if __name__ == '__main__':
+    in_out_dir = './resulte_data/count.xlsx'
+    in_out_data = read_excel_count(in_out_dir)
+    in_data = np.array(in_out_data[0])
+    out_data = np.array(in_out_data[1])
+    total_data = in_data + out_data
+    in_persents = []
+    for i in range(len(in_data)):
+        in_num = in_data[i]
+        total = total_data[i]
+        in_persent = in_num / total
+        in_persents.append(in_persent)
+    print(in_persents)
+    print(in_out_data)

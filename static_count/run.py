@@ -60,8 +60,9 @@ print('count_tt1 over!')
 
 # 计算tf-idf
 # word为单位：
-# corpus0 = count.get_corpus_word(abstract_list)
-# all_tf_idf = count.tf_idf_abs_all(abstract_list,corpus0)
+corpus0 = tf_idf.get_corpus_word(abstract_list)
+all_tf_idf = tf_idf.tf_idf_abs_all(abstract_list,corpus0)
+
 # data_tf_idf = DataFrame(all_tf_idf)
 # data_tf_idf = DataFrame(np.array(all_tf_idf)[:,1])
 # DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
@@ -85,7 +86,7 @@ print('count_tt1 over!')
 # print(keyword_list[4])
 # print(np.average(kw_len))
 #
-# n_kw_len = count.count_n_kw_len(keyword_list)
+n_kw_len = count.count_n_kw_len(keyword_list)
 # flatten =count.flatten_len(n_kw_len)
 # print(flatten)
 # preprocess.save(flatten,'flatten_len5')
