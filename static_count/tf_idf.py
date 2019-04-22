@@ -66,42 +66,72 @@ def get_n_gram_list(abs_list, n):
     return [n_gram(abs,n) for abs in abs_list]
 
 
-# 以n_gram为单位计算tf
-def tf(word, n_grams):
-    count = FreqDist(n_grams)
-    return count[word] / sum(count.values())
-
-
-# 以n_gram为单位计算df
-def n_containing(word, n_gram_list):
-    count_list = [FreqDist(n_grams) for n_grams in n_gram_list]
-    return sum(1 for count in count_list if word in count)
-
-
-# 以n_gram为单位计算idf
-def idf(word, n_gram_list):
-    count_list = [FreqDist(n_grams) for n_grams in n_gram_list]
-    return math.log(len(count_list) / (1 + n_containing(word, count_list)))
-
-# 以n_gram为单位计算tf-idf
-def tfidf(word, n_grams, n_gram_list):
-    return tf(word, n_grams) * idf(word, n_gram_list)
+# 构造corpus n_gram
+def get_corpus_ngram(n_gram_list):
+    return TextCollection(n_gram_list)
 
 
 # 计算一篇摘要的所有词的tf-idf (以n_gram为单位)
-def tf_idf_abs_n_gram(abs_n_grams, abs_n_gram_list):
-    return [tfidf(n_gram, abs_n_grams, abs_n_gram_list) for n_gram in abs_n_grams]
+def tf_idf_abs_n_gram(abs_n_grams, corpus_ngram):
+    return [corpus_ngram.tf_idf(n_gram, corpus_ngram) for n_gram in abs_n_grams]
 
 
-# 计算n篇摘要的所有词的tf-idf (以word为单位)
-def tf_idf_abs_all_n_gram(abs_n_gram_list):
-    return [tf_idf_abs_n_gram(abs_n_grams,abs_n_gram_list) for abs_n_grams in abs_n_gram_list]
+
+# 计算n篇摘要的所有词的tf-idf (以n_gram为单位)
+def tf_idf_abs_all_n_gram(abs_n_gram_list, corpus_ngram):
+    return [tf_idf_abs_n_gram(abs_n_grams,corpus_ngram) for abs_n_grams in abs_n_gram_list]
 
 
-# 统计一篇文档的关键词(整个词组)的tf—idf corpus以n_gram为单位
-def tf_idf_kw_n_gram(keywords, abs_n_grams,abs_n_gram_list):
+# 统计一篇文档的关键词(整个词组)的tf—idf corpus以word为单位
+# ('This', 'paper') ======kw处理成这种格式
+def tf_idf_kw_n_gram(keywords, corpus_ngram):
     tf_idf_dict = {}
     for kw in keywords:
-        tf_idf = tfidf(kw,abs_n_grams,abs_n_gram_list)
+        kw = tuple([term for term in keywords.split(' ')])
+        tf_idf = corpus_ngram.tf_idf(kw,corpus_ngram)
         tf_idf_dict.update({kw : tf_idf})
     return tf_idf_dict
+
+
+
+
+# 自定义tf-idf
+# # 以n_gram为单位计算tf
+# def tf(word, n_grams):
+#     count = FreqDist(n_grams)
+#     return count[word] / sum(count.values())
+#
+#
+# # 以n_gram为单位计算df
+# def n_containing(word, n_gram_list):
+#     count_list = [FreqDist(n_grams) for n_grams in n_gram_list]
+#     return sum(1 for count in count_list if word in count)
+#
+#
+# # 以n_gram为单位计算idf
+# def idf(word, n_gram_list):
+#     count_list = [FreqDist(n_grams) for n_grams in n_gram_list]
+#     return math.log(len(count_list) / (1 + n_containing(word, count_list)))
+#
+# # 以n_gram为单位计算tf-idf
+# def tfidf(word, n_grams, n_gram_list):
+#     return tf(word, n_grams) * idf(word, n_gram_list)
+#
+#
+# # 计算一篇摘要的所有词的tf-idf (以n_gram为单位)
+# def tf_idf_abs_n_gram(abs_n_grams, abs_n_gram_list):
+#     return [tfidf(n_gram, abs_n_grams, abs_n_gram_list) for n_gram in abs_n_grams]
+#
+#
+# # 计算n篇摘要的所有词的tf-idf (以n_gram为单位)
+# def tf_idf_abs_all_n_gram(abs_n_gram_list):
+#     return [tf_idf_abs_n_gram(abs_n_grams,abs_n_gram_list) for abs_n_grams in abs_n_gram_list]
+#
+#
+# # 统计一篇文档的关键词(整个词组)的tf—idf corpus以n_gram为单位
+# def tf_idf_kw_n_gram(keywords, abs_n_grams,abs_n_gram_list):
+#     tf_idf_dict = {}
+#     for kw in keywords:
+#         tf_idf = tfidf(kw,abs_n_grams,abs_n_gram_list)
+#         tf_idf_dict.update({kw : tf_idf})
+#     return tf_idf_dict

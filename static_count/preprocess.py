@@ -19,11 +19,11 @@ def get_info(json_obj):
     keyword_list =[]
     title_list =[]
     for one in json_obj:
-        keyword = one['keyword'].split(';')
+        keyword = one['keyword'].lower().split(';')
         if len(keyword) > 10:   # 去除关键词个数大于10的数据
             continue
-        abstract = one['abstract']
-        title = one['title']
+        abstract = one['abstract'].lower()
+        title = one['title'].lower()
         abstract_list.append(abstract)
         keyword_list.append(keyword)
         title_list.append(title)
