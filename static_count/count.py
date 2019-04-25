@@ -52,16 +52,16 @@ def count_part_in_stem_or(abstract, keyword_list):
     in_out_list = []
     in_num = 0
     abs_stem = preprocess.stemming_list(abstract)
-    print(abs_stem)
-    print(keyword_list)
+    # print(abs_stem)
+    # print(keyword_list)
     for keyword in keyword_list:
         kw_stem_words = preprocess.stemming_list(keyword)
-        print(kw_stem_words)
+        # print(kw_stem_words)
         for word_stem in kw_stem_words:
             if word_stem in abs_stem:
                 in_num += 1
                 break
-    print('================')
+    # print('================')
     in_out_list.append(in_num)
     in_out_list.append(len(keyword_list) - in_num)
     return in_out_list
@@ -344,8 +344,8 @@ if __name__ == '__main__':
     keyword_list = ['telepresence','animation','avatars','application sharing','collaborative virtual environments']
     print(count_in_stem(abs,keyword_list))
     print(count_in(abs,keyword_list))
-    print(count_part_in_stem(abs,keyword_list))
-    print(count_part_in(abs,keyword_list))
+    print(count_part_in_stem_or(abs,keyword_list))
+    print(count_part_in_or(abs,keyword_list))
     str = 'thi paper propos use virtual realiti to enhanc the percept of action by distant user on a share ' \
           'application. here, distanc may refer either to space ( e.g. in a remot synchron collaboration) or ' \
           'time ( e.g. dure playback of record actions). our approach consist in immers the applic in a virtual' \
