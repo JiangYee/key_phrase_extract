@@ -132,16 +132,22 @@ def count_part_in_and(abstract, keyword_list):
 
 
 # n篇文档count_in（）(整个词组)
-def count_in_all(abstract_list, keyword_lists, isPart, isStem):
+def count_in_all(abstract_list, keyword_lists, isPart, isStem, isAnd):
     result = []
     for i in range(len(abstract_list)):
         abstract = abstract_list[i]
         keyword_list = keyword_lists[i]
         if isPart:  # 以word为单位
-            if isStem:
-                result.append(count_part_in_stem_or(abstract,keyword_list))
-            else:
-                result.append(count_part_in_or(abstract,keyword_list))
+            if isAnd:   # and
+                if isStem:
+                    result.append(count_part_in_stem_and(abstract, keyword_list))
+                else:
+                    result.append(count_part_in_and(abstract,keyword_list))
+            else:   # or
+                if isStem:
+                    result.append(count_part_in_stem_or(abstract,keyword_list))
+                else:
+                    result.append(count_part_in_or(abstract,keyword_list))
         else:   # 以整个phrase为单位
             if isStem:
                 result.append(count_in_stem(abstract,keyword_list))

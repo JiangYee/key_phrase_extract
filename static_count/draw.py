@@ -36,51 +36,34 @@ def draw_violin(data, title, x_name, y_name, x_ticks,  x_ticklabels):
     plt.title(title)
     plt.show()
 
+
+def draw_pie(persent, labels, title):
+    explode = np.zeros(len(persent))  # 0.1 凸出这部分，
+    plt.axes(aspect=1)  # 设置为圆形
+    plt.pie(x=persent, labels=labels, explode=explode, autopct='%3.1f %%',
+            shadow=False, labeldistance=1.1, startangle=90, pctdistance=0.6)
+    plt.title(title)
+    # plt.legend(loc="upper right", fontsize=10, bbox_to_anchor=(1.1, 1.05), borderaxespad=0.3)
+    plt.show()
+
+
 if __name__ == "__main__":
 
-    # # load data
-    # # count in/out excel数据
-    # in_out_dir = './resulte_data/count_ft1.xlsx'
-    # in_out_data = preprocess.read_excel_count(in_out_dir)
+    # load data
+    # count in/out excel数据
+    in_out_dir = './resulte_data/count_ff1.xlsx'
+    in_out_data = preprocess.read_excel_count(in_out_dir)
 
     # count_in_out_persents
     # in_out_persents = count.in_out_persents(in_out_dir)
     # in_persents = [num for num in in_out_persents[0] if num < 4]
 
-    # len（pickle）
-    flatten_len_tokenize = preprocess.read('./4_25(24)/persent_len_tokenize_new')
-    persents = list(flatten_len_tokenize.values())
-    labels = list(flatten_len_tokenize.keys())
+    # len——persent（pickle）
+    # flatten_len_tokenize = preprocess.read('./4_24/persent_len_tokenize_new')
+    # persents = list(flatten_len_tokenize.values())
+    # labels = list(flatten_len_tokenize.keys())
 
-    # labels = ['A', 'B', 'C']
-    # fracs = [0.3, 0.5, 0.2]
-    explode = np.zeros(len(persents))  # 0.1 凸出这部分，
-    plt.axes(aspect=1)  # set this , Figure is round, otherwise it is an ellipse
-    # autopct ，show percet
-    plt.pie(x=persents, labels=labels, explode=explode, autopct='%3.1f %%',
-            shadow=False, labeldistance=1.1, startangle=90, pctdistance=0.6)
-    plt.title('persent_len_tokenize')
-    # plt.legend(loc="upper right", fontsize=10, bbox_to_anchor=(1.1, 1.05), borderaxespad=0.3)
-    plt.show()
-    # print(len(flatten_len_tokenize))
-    # count_10 = 0
-    # count_5 = 0
-    # for len_kw in flatten_len_tokenize:
-    #     if len_kw <= 10 :
-    #         count_10 += 1
-    #     if len_kw <= 5:
-    #         count_5 += 1
-    # print(count_10)
-    # print(count_5)
-    # print(len(preprocess.read('../static_count/count_data/flatten_len')))
-    # print(len(preprocess.read('../static_count/count_data/flatten_len10')))
-    # print(len(preprocess.read('../static_count/count_data/flatten_len5')))
-    # len_dir= 'flatten_len10'
-    # len_data = preprocess.read(len_dir)
-    # print(len(len_data))
-    # len_data = [data for data in len_data if data < 6]
-    # print(len(len_data))
-    # print(max(len_data))
+
 
     # json_file = '../data/test_json'
     # json_obj = preprocess.load_json(json_file)
@@ -88,10 +71,9 @@ if __name__ == "__main__":
     # n_kw_len = count.count_n_kw_len(keyword_list)
     # count_results = count.count_in_all(abstract_list, keyword_list, isPart=False, isStem=False)
     # in_num_list, out_num_list, _, _ = count.cal_in_out_avg(count_results)
-    #
     # all_data = [in_num_list,out_num_list]
 
-    # draw(in_out_data, 'in_out_ft','x','num of keywords',[1,2],['in','out'])
+    draw(in_out_data, 'in_out_ft','x','num of keywords',[1,2],['in','out'])
     # draw(in_out_persents, 'in_out_persents_tt','','persents',[1,2],['in','out'])
     # draw_violin(in_out_persents[0],'violin plot: in_persents_ft','','persents',[1],['in'])
     # draw(len_data, 'length of keyphrase','x','length of keyphrase',[1],['x1'])
