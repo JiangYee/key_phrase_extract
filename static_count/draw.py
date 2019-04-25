@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import matplotlib.pyplot as plt
+import numpy as np
 from static_count import preprocess,count
 
 # x_ticks: [1,2,3]
@@ -47,19 +48,19 @@ if __name__ == "__main__":
     # in_persents = [num for num in in_out_persents[0] if num < 4]
 
     # len（pickle）
-    flatten_len_tokenize = preprocess.read('persents_len')
-    test = flatten_len_tokenize.tolist()
-    print(test)
-    persents_dict = count.get_percentage(test)
-    print(persents_dict)
+    flatten_len_tokenize = preprocess.read('./4_25(24)/persent_len_tokenize_new')
+    persents = list(flatten_len_tokenize.values())
+    labels = list(flatten_len_tokenize.keys())
 
-    labels = 'A', 'B', 'C'
-    fracs = [0.3, 0.5, 0.2]
-    explode = [0, 0, 0]  # 0.1 凸出这部分，
+    # labels = ['A', 'B', 'C']
+    # fracs = [0.3, 0.5, 0.2]
+    explode = np.zeros(len(persents))  # 0.1 凸出这部分，
     plt.axes(aspect=1)  # set this , Figure is round, otherwise it is an ellipse
     # autopct ，show percet
-    plt.pie(x=fracs, labels=labels, explode=explode, autopct='%3.1f %%',
-            shadow=True, labeldistance=1.1, startangle=90, pctdistance=0.6)
+    plt.pie(x=persents, labels=labels, explode=explode, autopct='%3.1f %%',
+            shadow=False, labeldistance=1.1, startangle=90, pctdistance=0.6)
+    plt.title('persent_len_tokenize')
+    # plt.legend(loc="upper right", fontsize=10, bbox_to_anchor=(1.1, 1.05), borderaxespad=0.3)
     plt.show()
     # print(len(flatten_len_tokenize))
     # count_10 = 0

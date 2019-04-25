@@ -7,6 +7,8 @@ from nltk.text import TextCollection
 from nltk import ngrams
 from nltk import FreqDist
 from nltk.tokenize import  word_tokenize
+import pandas as pd
+from pandas.core.frame import DataFrame
 import numpy as np
 from static_count import preprocess
 
@@ -17,12 +19,10 @@ from static_count import preprocess
 def count_in_stem(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    abs_stem = preprocess.stemming_tokenizer(abstract)
-    # print(abs_stem)
+    abs_stem = preprocess.stemming_list(abstract)
 
     for keyword in keyword_list:
-        kd_stem = preprocess.stemming_str(keyword, ' ')
-        # print(kd_stem)
+        kd_stem = preprocess.stemming_str(keyword)
         if kd_stem in abs_stem:
             in_num += 1
     in_out_list.append(in_num)
@@ -34,13 +34,11 @@ def count_in_stem(abstract, keyword_list):
 def count_in(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    tokenzer = WordPunctTokenizer()
-    # abs_words = nltk.tokenize.word_tokenize(abstract)
-    abs_words = tokenzer.tokenize(abstract)
-    # print(abs_words)
+    # tokenzer = WordPunctTokenizer()
+    # abs_words = tokenzer.tokenize(abstract)
+    abs_words = abstract.split(' ')
 
     for keyword in keyword_list:
-        # print(keyword)
         if keyword in abs_words:
             in_num += 1
     in_out_list.append(in_num)
@@ -48,18 +46,40 @@ def count_in(abstract, keyword_list):
     return in_out_list
 
 
-# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数 keyword(stemming)
-def count_part_in_stem(abstract, keyword_list):
+# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数 keyword(stemming) or
+# soft-in 处理成一个word
+def count_part_in_stem_or(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    abs_stem = preprocess.stemming_tokenizer(abstract)
-    # print(abs_stem)
+    abs_stem = preprocess.stemming_list(abstract)
+    print(abs_stem)
+    print(keyword_list)
+    for keyword in keyword_list:
+        kw_stem_words = preprocess.stemming_list(keyword)
+        print(kw_stem_words)
+        for word_stem in kw_stem_words:
+            if word_stem in abs_stem:
+                in_num += 1
+                break
+    print('================')
+    in_out_list.append(in_num)
+    in_out_list.append(len(keyword_list) - in_num)
+    return in_out_list
+
+
+# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数（keyword 原始数据） or
+# # soft-in 处理成一个word
+def count_part_in_or(abstract, keyword_list):
+    in_out_list = []
+    in_num = 0
+    # tokenzer = WordPunctTokenizer()
+    # abs_words = tokenzer.tokenize(abstract)
+    abs_words = abstract.split(' ')
 
     for keyword in keyword_list:
-        kd_stem_words = preprocess.stemming_list(keyword, ' ')
-        # part_in = False
-        for word_stem in kd_stem_words:
-            if word_stem in abs_stem:
+        kw_words = keyword.split(' ')
+        for word in kw_words:
+            if word in abs_words:
                 in_num += 1
                 break
     in_out_list.append(in_num)
@@ -67,20 +87,45 @@ def count_part_in_stem(abstract, keyword_list):
     return in_out_list
 
 
-# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数（keyword 原始数据）
-def count_part_in(abstract, keyword_list):
+# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数 keyword(stemming) or
+# soft-in 处理成一个word     e.g. soft-in，information 为2个词
+def count_part_in_stem_and(abstract, keyword_list):
     in_out_list = []
     in_num = 0
-    tokenzer = WordPunctTokenizer()
-    abs_words = tokenzer.tokenize(abstract)
-    # print(abs_words)
+    abs_stem = preprocess.stemming_list(abstract)
 
     for keyword in keyword_list:
-        kd_words = keyword.split(' ')
-        for word in kd_words:
-            if word in abs_words:
-                in_num += 1
+        all_in = True
+        kw_stem_words = preprocess.stemming_list(keyword)
+        for word_stem in kw_stem_words:
+            if not word_stem in abs_stem:
+                all_in = False
                 break
+        if all_in:   #  该keyphrase的所有word都在abstract中出现时，认为该keyphrase在摘要中出现
+            in_num += 1
+    in_out_list.append(in_num)
+    in_out_list.append(len(keyword_list) - in_num)
+    return in_out_list
+
+
+# 统计单篇文档的关键词(以word为单位)在摘要中出现/未出现的个数（keyword 原始数据） or
+# # soft-in 处理成一个word
+def count_part_in_and(abstract, keyword_list):
+    in_out_list = []
+    in_num = 0
+    # tokenzer = WordPunctTokenizer()
+    # abs_words = tokenzer.tokenize(abstract)
+    abs_words = abstract.split(' ')
+
+    for keyword in keyword_list:
+        all_in = True
+        kw_words = keyword.split(' ')
+        for word in kw_words:
+            if not word in abs_words:
+                all_in = False
+                break
+        if all_in:
+            in_num += 1     #   该keyphrase的所有word都在abstract中出现时，认为该keyphrase在摘要中出现
     in_out_list.append(in_num)
     in_out_list.append(len(keyword_list) - in_num)
     return in_out_list
@@ -94,9 +139,9 @@ def count_in_all(abstract_list, keyword_lists, isPart, isStem):
         keyword_list = keyword_lists[i]
         if isPart:  # 以word为单位
             if isStem:
-                result.append(count_part_in_stem(abstract,keyword_list))
+                result.append(count_part_in_stem_or(abstract,keyword_list))
             else:
-                result.append(count_part_in(abstract,keyword_list))
+                result.append(count_part_in_or(abstract,keyword_list))
         else:   # 以整个phrase为单位
             if isStem:
                 result.append(count_in_stem(abstract,keyword_list))
@@ -174,13 +219,19 @@ def count_kw_len(keyword_list):
 
 # def count_kw_len(keyword_list):
 #     tokenzer = WordPunctTokenizer()
-#     len_kw = [len3(tokenzer.tokenize(keyword)) for keyword in keyword_list]
-#
+#     len_kw = [len(tokenzer.tokenize(keyword)) for keyword in keyword_list]
+#     # len_kw = [len(keyword.split()) for keyword in keyword_list]
+#     exp_data = []
 #     for i in range(len(len_kw)):
 #         if len_kw[i] > 10:
 #             print(len_kw[i], '=====', keyword_list[i])
-#             for kw in keyword_list[i]:
-#                 print(kw)
+#             exp_data.append(keyword_list[i])
+#             # for kw in keyword_list[i].split():
+#                 # print(kw,' ***')
+#     if(len(exp_data)>0):
+#         print(exp_data)
+#     # data = DataFrame(exp_data)
+#     # DataFrame(data).to_excel('len_morethan10_data.xlsx')
 #     return len_kw
 
 

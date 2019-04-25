@@ -6,6 +6,8 @@ from nltk.tokenize import WordPunctTokenizer
 import pickle
 import pandas as pd
 import numpy as np
+import re
+
 
 def load_json(path):
     with open(path, 'r', encoding='utf8') as fin:
@@ -22,7 +24,8 @@ def get_info(json_obj):
         keyword = one['keyword'].lower().split(';')
         if len(keyword) > 10:   # 去除关键词个数大于10的数据
             continue
-        abstract = one['abstract'].lower()
+        abstract_temp = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9-°]', ' ', one['abstract']).lower()  # 去除标点 不包含 '-'
+        abstract = (re.sub(r'\s{2,}', ' ', abstract_temp)).strip()  # 消除上述步骤产生的空格
         title = one['title'].lower()
         abstract_list.append(abstract)
         keyword_list.append(keyword)
@@ -30,42 +33,64 @@ def get_info(json_obj):
     return abstract_list, keyword_list, title_list
 
 
-# stemming for a string, use str.split()  (not remove stopwords)
+
+
+# stemming for a string, use str.split(' ') 使用空格分词  (not remove stopwords)
 # return: string
-def stemming_str(str, split_token):
+def stemming_str(str):
     # str = re.sub(r'[’!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~]+]', '', str) #去掉标点
     # str = re.sub(r'[^\u4e00-\u9fa5a-zA-Z0-9~!@#$%^&*()_+<>?:,./;’，。、‘：“《》？~！@#￥%……（）]', ' ', str) #去掉标点
+    # str = re.sub(r'[,.:;?()[]&!*@#$%]', '', str)  # 去除标点 不包含 '-'
     stemmer = nltk.stem.PorterStemmer()
     str_stem = ''
-    for term in str.split(split_token):
-        term_stem = stemmer.stem(term)
+    for term in str.split(' '):
+        if '-' in term:         # 将类似 'soft-in-soft-out' 词组处理为一个keyword
+            term_stem = ''
+            for sub_term in term.split('-'):
+                term_stem = term_stem + '-' + stemmer.stem(sub_term)
+            term_stem = term_stem.strip('-')
+        else:
+            term_stem = stemmer.stem(term)
         str_stem = str_stem + ' ' + term_stem
     return str_stem.strip()
 
 
-# stemming for a string, use str.split() (not remove stopwords)
+# stemming for a string, use str.split(' ')使用空格分词 (not remove stopwords)
 # return: list
-def stemming_list(str, split_token):
+def stemming_list(str):
     stem_list = []
     stemmer = nltk.stem.PorterStemmer()
-    words = str.split(split_token)
-    for word in words:
-        word_stem = stemmer.stem(word)
-        stem_list.append(word_stem)
+    # words = str.split(' ')
+    # for word in words:
+    #     word_stem = stemmer.stem(word)
+    #     stem_list.append(word_stem)
+    for term in str.split(' '):
+        if '-' in term:         # 将类似 'soft-in-soft-out' 词组处理为一个keyword
+            term_stem = ''
+            for sub_term in term.split('-'):
+                term_stem = term_stem + '-' + stemmer.stem(sub_term)
+            term_stem = term_stem.strip('-')
+        else:
+            term_stem = stemmer.stem(term)
+        stem_list.append(term_stem)
+
     return stem_list
 
 
-# stemming for a string, use tokenizer() (not remove stopwords)
-# return: list
-def stemming_tokenizer(str):
-    stem_list = []
-    stemmer = nltk.stem.PorterStemmer()
-    tokenzer = WordPunctTokenizer()
-    words = tokenzer.tokenize(str)
-    for word in words:
-        word_stem = stemmer.stem(word)
-        stem_list.append(word_stem)
-    return stem_list
+# # stemming for a string, use tokenizer() (not remove stopwords)
+# # return: list
+# def stemming_tokenizer(str):
+#     stem_list = []
+#     stemmer = nltk.stem.PorterStemmer()
+#     tokenzer = WordPunctTokenizer()
+#     words = tokenzer.tokenize(str)
+#     # english_punctuations = [',', '.', ':', ';', '?', '(', ')', '[', ']', '&', '!', '*', '@', '#', '$', '%']
+#     for word in words:
+#         # if word in english_punctuations:  # 去除标点 不包含 '-'
+#         #     continue
+#         word_stem = stemmer.stem(word)
+#         stem_list.append(word_stem)
+#     return stem_list
 
 
 # pickle读取数据
