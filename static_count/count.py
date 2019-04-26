@@ -6,7 +6,7 @@ from nltk.tokenize import WordPunctTokenizer
 from nltk.text import TextCollection
 from nltk import ngrams
 from nltk import FreqDist
-from nltk.tokenize import  word_tokenize
+from nltk.tokenize import word_tokenize
 import pandas as pd
 from pandas.core.frame import DataFrame
 import numpy as np
@@ -155,6 +155,7 @@ def count_in_all(abstract_list, keyword_lists, isPart, isStem, isAnd):
                 result.append(count_in(abstract,keyword_list))
     return result
 
+
 # 统计in/out num_list; 计算n篇文档关键词出现与否的平均值
 def cal_in_out_avg(count_results):
     in_num_list = []
@@ -169,23 +170,25 @@ def cal_in_out_avg(count_results):
     return in_num_list, out_num_list, avg_in, avg_out
 
 
+# 统计每篇文档的in（out）在该篇文档的关键词总数中所占的比例（2（in），3（out），2/5，3/5）
 def in_out_persents(excel_dir):
     in_out_data = preprocess.read_excel_count(excel_dir)
     in_data = np.array(in_out_data[0])
     out_data = np.array(in_out_data[1])
     total_data = in_data + out_data
-    in_persents = []
-    out_persents = []
+    in_persent = []
+    out_persent = []
     for i in range(len(in_data)):
         in_num = in_data[i]
         out_num = out_data[i]
         total = total_data[i]
-        in_persent = in_num / total
-        out_persent = out_num / total
-        in_persents.append(in_persent)
-        out_persents.append(out_persent)
+        in_percent = round(in_num / total, 2)
+        out_percent = round(out_num / total, 2)
+        in_persent.append(in_percent)
+        out_persent.append(out_percent)
 
-    return [in_persents,out_persents]
+    return [in_persent,out_persent]
+
 
 
 # ====================================================
@@ -276,7 +279,7 @@ def get_percentage(count_list):
 
     for num in count_set:
         percent = count_list.count(num) / total_num
-        persents.update({num: percent})
+        persents.update({num: round(percent, 4)})
     return persents
 
 

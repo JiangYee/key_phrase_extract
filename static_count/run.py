@@ -7,8 +7,8 @@ from pandas.core.frame import DataFrame
 from nltk import ngrams
 from static_count import preprocess, count,tf_idf
 
-# json_file = '../data/test_json'
-json_file = '../data/all_title_abstract_keyword_clean.json'
+json_file = '../data/test_json'
+# json_file = '../data/all_title_abstract_keyword_clean.json'
 json_obj = preprocess.load_json(json_file)
 abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(keyword_list[144])
@@ -17,12 +17,13 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 
 
 # # 统计关键词in or not in
-# count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=False)
+# count_results = count.count_in_all(abstract_list, keyword_list, isPart=False,isStem=False, isAnd=False)
 # in_num_list, out_num_list, avg_in, avg_out = count.cal_in_out_avg(count_results)
 # count_dict = {'in':in_num_list,'out':out_num_list}
 # print(count_results)
+# print(in_num_list)
+# print(out_num_list)
 # print(avg_in,avg_out)
-# #
 # data=DataFrame(count_dict)  #将字典转换成为数据框
 # DataFrame(data).to_excel('count_ff1.xlsx')
 # print('count_ff1 over!')
@@ -32,7 +33,6 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # count_dict = {'in':in_num_list,'out':out_num_list}
 # print(count_results)
 # print(avg_in,avg_out)
-# #
 # data=DataFrame(count_dict)  #将字典转换成为数据框
 # DataFrame(data).to_excel('count_ft1.xlsx')
 # print('count_ft1 over!')
@@ -42,9 +42,8 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # count_dict = {'in':in_num_list,'out':out_num_list}
 # print(count_results)
 # print(avg_in,avg_out)
-# #
 # data=DataFrame(count_dict)  #将字典转换成为数据框
-# DataFrame(data).to_excel('count_tf1.xlsx')
+# DataFrame(data).to_excel('count_tff1.xlsx')
 # print('count_tf1 over!')
 #
 # count_results = count.count_in_all(abstract_list, keyword_list, isPart=True,isStem=True)
@@ -52,10 +51,19 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # count_dict = {'in':in_num_list,'out':out_num_list}
 # print(count_results)
 # print(avg_in,avg_out)
-# #
 # data=DataFrame(count_dict)  #将字典转换成为数据框
-# DataFrame(data).to_excel('count_tt1.xlsx')
+# DataFrame(data).to_excel('count_ttf1.xlsx')
 # print('count_tt1 over!')
+
+
+# 统计每篇文章的count_in_out百分比
+# in_out_persent =  count.in_out_persents('./4_25/count_ff1.xlsx')
+# in_persent = in_out_persent[0]
+# out_persent = in_out_persent[1]
+# print(in_persent[:10])
+# print(out_persent[:10])
+# in_persent_persent = count.get_percentage(in_persent[0:10])
+# print(in_persent_persent)
 
 
 # 计算tf-idf
@@ -81,27 +89,28 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 
 
 
-# 统计关键词长度
-# kw_len= count.count_kw_len(keyword_list[4])
-# print(keyword_list[4])
-# print(np.average(kw_len))
-#
-# print('统计关键词长度......')
+# # 统计关键词长度
+# # kw_len= count.count_kw_len(keyword_list[4])
+# # print(keyword_list[4])
+# # print(np.average(kw_len))
+# #
+# # print('统计关键词长度......')
 # n_kw_len = count.count_n_kw_len(keyword_list)
-# print('exp_num', exp_num)
+# # print('exp_num', exp_num)
 # flatten =count.flatten_len(n_kw_len)
-# print(len(flatten))
-# preprocess.save(flatten,'flatten_len_tokenize')
-# data=DataFrame(flatten)
-# DataFrame(data).to_excel('flatten_len5.xlsx')
+# # print(len(flatten))
+# preprocess.save(flatten,'flatten_len_tokenize_new')
+# # data=DataFrame(flatten)
+# # DataFrame(data).to_excel('flatten_len.xlsx')
 
 # 统计百分比
-print('统计百分比...')
-flatten_len_tokenize = preprocess.read('./count_data/flatten_len').tolist()
-persents_dict = count.get_percentage(flatten_len_tokenize)
-preprocess.save(persents_dict, 'persents_len')
-data=DataFrame({'length':persents_dict.keys(), 'percent':persents_dict.values()})
-DataFrame(data).to_excel('persents_len.xlsx')
+# print('统计百分比...')
+# flatten_len_tokenize = preprocess.read('flatten_len_tokenize').tolist()
+# persents_dict = count.get_percentage(flatten_len_tokenize)
+# print(persents_dict)
+# preprocess.save(persents_dict, 'persents_len_tokenize')
+# data=DataFrame({'length':list(persents_dict.keys()), 'percent':list(persents_dict.values())})
+# DataFrame(data).to_excel('persents_len_tokenize.xlsx')
 
 # preprocess.save(n_kw_len,'len')
 # data=DataFrame({'keyword': keyword_list, 'len':n_kw_len})
