@@ -5,10 +5,11 @@ import numpy as np
 import pandas as pd
 from pandas.core.frame import DataFrame
 from nltk import ngrams
-from static_count import preprocess, count,tf_idf
+from nltk.text import TextCollection
+from static_count import preprocess, count, tf_idf, draw
 
-json_file = '../data/test_json'
-# json_file = '../data/all_title_abstract_keyword_clean.json'
+# json_file = '../data/test_json'
+json_file = '../data/all_title_abstract_keyword_clean.json'
 json_obj = preprocess.load_json(json_file)
 abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(keyword_list[144])
@@ -66,29 +67,6 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(in_persent_persent)
 
 
-# 计算tf-idf
-# word为单位：
-# corpus0 = tf_idf.get_corpus_word(abstract_list)
-# all_tf_idf = tf_idf.tf_idf_abs_all(abstract_list,corpus0)
-
-# data_tf_idf = DataFrame(all_tf_idf)
-# data_tf_idf = DataFrame(np.array(all_tf_idf)[:,1])
-# DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
-# 关键词的tf-idf
-# tf_idf_kw = count.tf_idf_kw(keyword_list[0], corpus0)
-# print(tf_idf_kw)
-
-# 以n_gram为单位：
-# n_grams = tf_idf.n_gram(abstract_list[0],2)
-# abs_n_gram_lsit = tf_idf.get_n_gram_list(abstract_list,2)
-# tfidf1 = tf_idf.tf_idf_abs_n_gram(n_grams,abs_n_gram_lsit)
-# data_tf_idf = DataFrame({'2-gram': n_grams, 'tf-idf':tfidf1})
-# DataFrame(data_tf_idf).to_excel('tf-idf_2gram.xlsx')
-# print(tfidf1)
-
-
-
-
 # # 统计关键词长度
 # # kw_len= count.count_kw_len(keyword_list[4])
 # # print(keyword_list[4])
@@ -129,3 +107,30 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # for gram in n_grams:
 #     if 'application' in gram:  # keyword中的word存在于n_gram中
 #         print(gram)
+
+
+
+# 计算tf-idf
+# word为单位：
+abstract_list = [preprocess.stemming_list(abs) for abs in abstract_list]
+corpus1 = TextCollection(abstract_list)
+tf_idf1 = tf_idf.tf_idf_abs(abstract_list[0], corpus1)
+kw_tf_idf1 = tf_idf.tf_idf_kw(keyword_list[0],corpus1)
+print(kw_tf_idf1)
+# corpus1 = tf_idf.get_corpus_word(abstract_list)
+# all_tf_idf1 = tf_idf.tf_idf_abs_all(abstract_list,corpus1)
+
+# data_tf_idf = DataFrame(all_tf_idf)
+# data_tf_idf = DataFrame(np.array(all_tf_idf)[:,1])
+# DataFrame(data_tf_idf).to_excel('tf-idf_test.xlsx')
+# 关键词的tf-idf
+# tf_idf_kw = count.tf_idf_kw(keyword_list[0], corpus0)
+# print(tf_idf_kw)
+
+# 以n_gram为单位：
+# n_grams = tf_idf.n_gram(abstract_list[0],2)
+# abs_n_gram_lsit = tf_idf.get_n_gram_list(abstract_list,2)
+# tfidf1 = tf_idf.tf_idf_abs_n_gram(n_grams,abs_n_gram_lsit)
+# data_tf_idf = DataFrame({'2-gram': n_grams, 'tf-idf':tfidf1})
+# DataFrame(data_tf_idf).to_excel('tf-idf_2gram.xlsx')
+# print(tfidf1)

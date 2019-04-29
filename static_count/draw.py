@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     # 统计每篇文档的in（out）在该篇文档的关键词总数中所占的比例（2（in），3（out），2/5，3/5）
     # 该比例在所有文档的比例数据中的比例
-    in_out_persent = count.in_out_persents('./4_25/count_ttt1.xlsx')
+    in_out_persent = count.in_out_persents('./4_25/count_ft1.xlsx')
     # in_persent = in_out_persent[0]
     # out_persent = in_out_persent[1]
     # print(in_persent[:10])
@@ -153,39 +153,100 @@ if __name__ == "__main__":
 
 
     in_data = list(in_out_persent[0])
-    out_data = list(in_out_persent[1])
-    label_in = sorted(set(in_data))
-    label_out = sorted(set(out_data))
-    print(label_in)
-    print(label_out)
-    count_in_list = [in_data.count(num) for num in label_in]
-    count_out_list = [out_data.count(num) for num in label_out]
+    # out_data = list(in_out_persent[1])
+
+    # 全部的percent值作为横坐标
+    # label_in = sorted(set(in_data))
+    # print(label_in)
+    # # label_out = sorted(set(out_data))
+    # # print(label_out)
+    # count_in_list = [in_data.count(num) for num in label_in]
+    # # count_out_list = [out_data.count(num) for num in label_out]
+    print('开始统计区间数据。。。')
+
+    # 统一区间长度 横坐标：[0,0.1](0.1,0.2](0.2,0.3]...[0.9,1.0]
+    # 直接统计
+    # interval_dict = count.divde_interval(in_data)
+    # label_in = list(interval_dict.keys())
+    # count_in_list = list(interval_dict.values())
+    # print(interval_dict)
+    # 先count in 再划分
+    percent_list = list(sorted(set(in_data)))
+    count_in_all = [in_data.count(num) for num in percent_list]
+    interval_num_dict = count.get_interval_num(percent_list)
+    print('切分区间后各个区间的percent数目',interval_num_dict)
+    label_in = list(interval_num_dict.keys())
+    interval_num_list = list(interval_num_dict.values())
+    count_in_list = count.devide_interval(interval_num_list, count_in_all)
+    # start_id = 0
+    # count_in_list = []
+    # for num in interval_num_list:
+    #     end_id = int(start_id + num)
+    #     print(start_id,'  ', end_id)
+    #     percent_sum = sum(count_in_all[start_id:end_id])
+    #     count_in_list.append(percent_sum)
+    #     start_id = end_id
 
     # 条形图 count_in_out count_persent
     x_lable = 'persent'  # 单篇文档的in/out的概率
     color_in = '#6295FF'
     color_out = '#FFAE50'
-    draw_bar(label_in, count_in_list, 'isPart:1 isStem:1 isAnd:1    persent_IN', color_in, x_lable)
+    draw_bar(label_in, count_in_list, 'isPart:0 isStem:1 isAnd:-    persent_IN', color_in, x_lable)
     # draw_bar(label_out, count_out_list, 'isPart:0 isStem:0 isAnd:-  persent_OUT', color_out, x_lable)
     # draw_bar_2([label_in, label_out], [count_in_list,count_out_list],'isPart:0 isStem:0 isAnd:-', x_lable)
 
     # 饼图  各比例在所有文档的比例数据中的比例
     in_persent_data = count.get_percentage(in_data)
-    out_persent_data = count.get_percentage(out_data)
-    persent_in = list(in_persent_data.values())
-    persent_out = list(out_persent_data.values())
-    keys_in = list(in_persent_data.keys())
-    keys_out = list(out_persent_data.keys())
+    # # out_persent_data = count.get_percentage(out_data)
+    # persent_in = list(in_persent_data.values())
+    # # persent_out = list(out_persent_data.values())
+    # keys_in = list(in_persent_data.keys())
+    # # keys_out = list(out_persent_data.keys())
 
-    print('in_persent_persent:', in_persent_data)
-    print('out_persent_persent: ',out_persent_data)
-    draw_pie(persent_in, keys_in, 'isPart:1 isStem:1 isAnd:1   in_persent')
+    # dict按key降序排序
+    persent_in_data = sorted(in_persent_data.items(), key=lambda d:d[0])
+    print(persent_in_data)
+    persent_in_sorted = [item[1] for item in persent_in_data]
+    persent_in = count.devide_interval(interval_num_list, persent_in_sorted)
+    print(persent_in)
+    keys_in = label_in
+    # print('in_persent_persent:', in_persent_data)
+    # print('out_persent_persent: ',out_persent_data)
+    draw_pie(persent_in, keys_in, 'isPart:0 isStem:1 isAnd:-   in_persent')
     # draw_pie(persent_out, keys_out, 'isPart:0 isStem:0 isAnd:-   out_persent')
 
 
+    # #   饼图 统计关键词个数的百分比
+    # json_obj = preprocess.load_json('../data/all_title_abstract_keyword_clean.json')
+    # _, keyword_len_list = preprocess.get_keywords(json_obj)
+    # num_persent_dict = count.get_percentage(keyword_len_list)
+    # num_persent = list(num_persent_dict.values())
+    # print(sum(num_persent[:10]))
+    # num_persent_new = num_persent[0:10]
+    # more_than_10 = 0
+    # for percent in num_persent[10:]:
+    #     more_than_10 += percent
+    # print(more_than_10)
+    # num_persent_new.append(more_than_10)
+    # lables = list(num_persent_dict.keys())[0:10]
+    # lables.append('>10')
+    # draw.draw_pie(num_persent_new, lables, 'persent of number of key phrase')
+    #
+    # # 条形图 count_in_out count_persent
+    # x_lable = 'number of key phrase'
+    # color_in = '#6295FF'
+    # color_out = '#FFAE50'
+    # number_set = list(set(keyword_len_list))
+    # count_list = [keyword_len_list.count(number) for number in number_set[0:10]]
+    # over_10 = 0
+    # for number in number_set[10:]:
+    #     over_10 += keyword_len_list.count(number)
+    # count_list.append(over_10)
+    # draw.draw_bar(lables, count_list, 'count for the number of key phrase', color_in, x_lable)
+    #
 
 
-    # 关键词单词个数百分比统计 persent（pickle）
+    # 关键词单词个数(关键词长度)百分比统计 persent（pickle）
     # flatten_len_tokenize = preprocess.read('./4_24/persent_len_new')
     # persent = list(flatten_len_tokenize.values())
     # labels = list(flatten_len_tokenize.keys())

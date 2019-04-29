@@ -279,12 +279,88 @@ def get_percentage(count_list):
 
     for num in count_set:
         percent = count_list.count(num) / total_num
-        persents.update({num: round(percent, 4)})
+        # persents.update({num: round(percent, 4)})
+        persents.update({num: percent})
     return persents
 
 
+# 概率区间归一化 [0,0.1) [0.1,0.2) [0.2,0.3)...[0.9,1.0]
+# def divde_interval(percent_list):
+#     percent_sum1 = 0
+#     percent_sum2 = 0
+#     percent_sum3 = 0
+#     percent_sum4 = 0
+#     percent_sum5 = 0
+#     percent_sum6 = 0
+#     percent_sum7 = 0
+#     percent_sum8 = 0
+#     percent_sum9 = 0
+#     percent_sum10 = 0
+#     for  percent in percent_list:
+#         if percent >= 0 and percent <0.1:
+#             percent_sum1 += percent_list.count(percent)
+#         elif percent < 0.2:
+#             percent_sum2 += percent_list.count(percent)
+#         elif percent < 0.3:
+#             percent_sum3 += percent_list.count(percent)
+#         elif percent < 0.4:
+#             percent_sum4 += percent_list.count(percent)
+#         elif percent < 0.5:
+#             percent_sum5 += percent_list.count(percent)
+#         elif percent < 0.6:
+#             percent_sum6 += percent_list.count(percent)
+#         elif percent < 0.7:
+#             percent_sum7 += percent_list.count(percent)
+#         elif percent < 0.8:
+#             percent_sum8 += percent_list.count(percent)
+#         elif percent < 0.9:
+#             percent_sum9 += percent_list.count(percent)
+#         else:
+#             percent_sum10 += percent_list.count(percent)
+#     return {'[0,0.1)':percent_sum1,'[0.1,0.2)':percent_sum2,'[0.2,0.3)':percent_sum3,
+#             '[0.3,0.4)':percent_sum4,'[0.4,0.5)':percent_sum5,'[0.5,0.6)':percent_sum6,
+#             '[0.6,0.7)':percent_sum7,'[0.7,0.8)':percent_sum8,'[0.8,0.9)':percent_sum9,
+#             '[0.9,1.0]':percent_sum10}
 
+# 概率区间归一化 [0,0.1) [0.1,0.2) [0.2,0.3)...[0.9,1.0]
+def get_interval_num(percent_set):
+    interval_num_list = np.zeros(10)
+    for percent in percent_set:
+        if percent >= 0 and percent <0.1:
+            interval_num_list[0] += 1
+        elif percent < 0.2:
+            interval_num_list[1] += 1
+        elif percent < 0.3:
+            interval_num_list[2] += 1
+        elif percent < 0.4:
+            interval_num_list[3] += 1
+        elif percent < 0.5:
+            interval_num_list[4] += 1
+        elif percent < 0.6:
+            interval_num_list[5] += 1
+        elif percent < 0.7:
+            interval_num_list[6] += 1
+        elif percent < 0.8:
+            interval_num_list[7] += 1
+        elif percent < 0.9:
+            interval_num_list[8] += 1
+        else:
+            interval_num_list[9] += 1
+    return {'[0,0.1)': interval_num_list[0], '[0.1,0.2)': interval_num_list[1], '[0.2,0.3)': interval_num_list[2],
+            '[0.3,0.4)': interval_num_list[3], '[0.4,0.5)': interval_num_list[4], '[0.5,0.6)': interval_num_list[5],
+            '[0.6,0.7)': interval_num_list[6], '[0.7,0.8)': interval_num_list[7], '[0.8,0.9)': interval_num_list[8],
+            '[0.9,1.0]': interval_num_list[9]}
 
+# interval_num_list:[0,0.1)中key个数
+def devide_interval(interval_num_list, count_all ):
+    start_id = 0
+    count_interval_list = []
+    for num in interval_num_list:
+        end_id = int(start_id + num)
+        percent_sum = sum(count_all[start_id:end_id])
+        count_interval_list.append(percent_sum)
+        start_id = end_id
+    return count_interval_list
 
 # ====================================================
 # 统计一个字符串str中某个word出现的频次  

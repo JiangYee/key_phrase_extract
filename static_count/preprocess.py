@@ -33,6 +33,17 @@ def get_info(json_obj):
     return abstract_list, keyword_list, title_list
 
 
+def get_keywords(json_obj):
+    keyword_list =[]
+    keyword_len_list = []
+    for one in json_obj:
+        keyword = one['keyword'].lower().split(';')
+        keyword_len_list.append(len(keyword))
+        keyword_list.append(keyword)
+    return keyword_list, keyword_len_list
+
+
+
 
 
 # stemming for a string, use str.split(' ') 使用空格分词  (not remove stopwords)

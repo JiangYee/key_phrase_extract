@@ -1,23 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from nltk.tokenize import WordPunctTokenizer
+# from nltk.tokenize import WordPunctTokenizer
 from nltk.text import TextCollection
 from nltk import ngrams, FreqDist
 import math
 
 
 # 构造tf-idf corpus (word为单位)
-def get_corpus_word(all_doc):
-    tokenzer = WordPunctTokenizer()
-    all_doc = [tokenzer.tokenize(doc) for doc in all_doc]  # 对所有摘要分词
-    corpus = TextCollection(all_doc)
+def get_corpus_word(all_abs):
+    all_abs = [abs.split(' ') for abs in all_abs]  # 对所有摘要分词
+    corpus = TextCollection(all_abs)
     return corpus
 
 
 # 计算一篇摘要的所有词的tf-idf (以word为单位)
 def tf_idf_abs(abstract, corpus):
-    tokenzer = WordPunctTokenizer()
-    abstract = tokenzer.tokenize(abstract)  # 对摘要分词
+    abstract = set(abstract.split(' ')) # 对摘要分词
     tf_idf_list = [corpus.tf_idf(word, corpus) for word in abstract]
 
     return tf_idf_list
@@ -55,8 +53,7 @@ def tf_idf_kw(keywords, corpus):
 # n_gram
 # 获取单文本的n_gram
 def n_gram(text,n):
-    tokenzer = WordPunctTokenizer()
-    text = tokenzer.tokenize(text)
+    text = text.split(' ')
     n_grams = ngrams(text,n)
     return [n_gram for n_gram in n_grams]
 
@@ -73,7 +70,7 @@ def get_corpus_ngram(n_gram_list):
 
 # 计算一篇摘要的所有词的tf-idf (以n_gram为单位)
 def tf_idf_abs_n_gram(abs_n_grams, corpus_ngram):
-    return [corpus_ngram.tf_idf(n_gram, corpus_ngram) for n_gram in abs_n_grams]
+    return [corpus_ngram.tf_idf(n_gram, corpus_ngram) for n_gram in set(abs_n_grams)]
 
 
 
@@ -82,7 +79,7 @@ def tf_idf_abs_all_n_gram(abs_n_gram_list, corpus_ngram):
     return [tf_idf_abs_n_gram(abs_n_grams,corpus_ngram) for abs_n_grams in abs_n_gram_list]
 
 
-# 统计一篇文档的关键词(整个词组)的tf—idf corpus以word为单位
+# 统计一篇文档的关键词(整个词组)的tf—idf corpus以n_gram为单位
 # ('This', 'paper') ======kw处理成这种格式
 def tf_idf_kw_n_gram(keywords, corpus_ngram):
     tf_idf_dict = {}
