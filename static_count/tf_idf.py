@@ -15,7 +15,9 @@ def get_corpus_word(all_abs):
 
 # 计算一篇摘要的所有词的tf-idf (以word为单位)
 def tf_idf_abs(abstract, corpus):
-    abstract = set(abstract.split(' ')) # 对摘要分词
+    # abstract = set(abstract.split(' ')) # 对摘要分词
+    abstract = set(abstract) # 对摘要分词
+
     tf_idf_list = [corpus.tf_idf(word, corpus) for word in abstract]
 
     return tf_idf_list
@@ -52,8 +54,9 @@ def tf_idf_kw(keywords, corpus):
 
 # n_gram
 # 获取单文本的n_gram
+# text：分词后的结果
 def n_gram(text,n):
-    text = text.split(' ')
+    # text = text.split(' ')
     n_grams = ngrams(text,n)
     return [n_gram for n_gram in n_grams]
 
@@ -84,11 +87,45 @@ def tf_idf_abs_all_n_gram(abs_n_gram_list, corpus_ngram):
 def tf_idf_kw_n_gram(keywords, corpus_ngram):
     tf_idf_dict = {}
     for kw in keywords:
-        kw = tuple([term for term in keywords.split(' ')])
+        kw = tuple([term for term in kw.split(' ')])
         tf_idf = corpus_ngram.tf_idf(kw,corpus_ngram)
         tf_idf_dict.update({kw : tf_idf})
     return tf_idf_dict
 
+
+#  获取一篇文档的关键词在摘要中的tf-idf排名
+def get_kw_rank(kw_tfidf_dict, tf_idf_abs):
+    kw_rank_dict = {}
+    # abstract中词的tf - idf去重
+    tf_idf_abs = list(set(tf_idf_abs))
+    # abstract中词的tf-idf值降序排序
+    tf_idf_abs.sort(reverse=True)
+    for keyword in kw_tfidf_dict:
+        rank = 0
+        kw_tfidf = kw_tfidf_dict.get(keyword)
+        if kw_tfidf not in tf_idf_abs:
+            for tfidf in tf_idf_abs:
+                if tfidf > kw_tfidf:
+                    continue
+                else:
+                    rank = tf_idf_abs.index(tfidf) + 1  #  取第一个比关键词小的index+1作为其rank
+                    break
+        else:
+            rank = tf_idf_abs.index(kw_tfidf) + 1
+        kw_rank_dict.update({keyword: rank})
+    return kw_rank_dict
+
+
+#  获取n篇文档的关键词在摘要中的tf-idf排名
+def get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list):
+    for i in range(len(kw_tfidf_dict_list)):
+        try:
+            get_kw_rank(kw_tfidf_dict_list[i], tf_idf_abs_list[i])
+        except ValueError :
+            print(kw_tfidf_dict_list[i])
+            print(tf_idf_abs_list[i])
+
+    return [get_kw_rank(kw_tfidf_dict_list[i], tf_idf_abs_list[i]) for i in range(len(tf_idf_abs_list))]
 
 
 

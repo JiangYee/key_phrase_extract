@@ -8,8 +8,8 @@ from nltk import ngrams
 from nltk.text import TextCollection
 from static_count import preprocess, count, tf_idf, draw
 
-# json_file = '../data/test_json'
-json_file = '../data/all_title_abstract_keyword_clean.json'
+json_file = '../data/test_json'
+# json_file = '../data/all_title_abstract_keyword_clean.json'
 json_obj = preprocess.load_json(json_file)
 abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 # print(keyword_list[144])
@@ -112,11 +112,91 @@ abstract_list, keyword_list, _ = preprocess.get_info(json_obj)
 
 # 计算tf-idf
 # word为单位：
+print("统计tf-idf")
+keyword_list =  preprocess.stemming_all_keyword_list(keyword_list)
 abstract_list = [preprocess.stemming_list(abs) for abs in abstract_list]
+
 corpus1 = TextCollection(abstract_list)
-tf_idf1 = tf_idf.tf_idf_abs(abstract_list[0], corpus1)
-kw_tf_idf1 = tf_idf.tf_idf_kw(keyword_list[0],corpus1)
-print(kw_tf_idf1)
+preprocess.save(corpus1,'corpus1')
+print('corpus1构建完成！')
+kw_tfidf_dict_list = [tf_idf.tf_idf_kw(kw_list_stem,corpus1) for kw_list_stem in keyword_list]
+tf_idf_abs_list = tf_idf.tf_idf_abs_all(abstract_list, corpus1)
+# print('kw_tfidf_dict_list: ', kw_tfidf_dict_list)
+# print('tf_idf_abs_list[1]: ',tf_idf_abs_list[1])
+
+preprocess.save(tf_idf_abs_list, 'all_abs_tfidf1')
+rank_list1 = tf_idf.get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list)
+preprocess.save(rank_list1,'tfidf_rank1')
+print('rank_list1: ',rank_list1)
+
+n_gram_lists = tf_idf.get_n_gram_list(abstract_list,2)
+corpus2 = TextCollection(n_gram_lists)
+preprocess.save(corpus2,'corpus2')
+print('corpus2构建完成！')
+kw_tfidf_dict_list = [tf_idf.tf_idf_kw_n_gram(kw_list_stem,corpus2) for kw_list_stem in keyword_list]
+tf_idf_abs_list = tf_idf.tf_idf_abs_all_n_gram(n_gram_lists, corpus2)
+# print('kw_tfidf_dict_list[1]: ', kw_tfidf_dict_list[1])
+# print('tf_idf_abs_list[1]: ',tf_idf_abs_list[1])
+preprocess.save(tf_idf_abs_list, 'all_abs_tfidf2')
+rank_list2 = tf_idf.get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list)
+# # abstract中词的tf - idf去重
+# tf_idf_abs = list(set(tf_idf_abs_list[1]))
+# # abstract中词的tf-idf值降序排序
+# tf_idf_abs.sort(reverse=True)
+# print('tf_idf_abs_list[1]: ',tf_idf_abs)
+preprocess.save(rank_list2,'tfidf_rank2')
+print('rank_list2: ',rank_list2)
+
+n_gram_lists = tf_idf.get_n_gram_list(abstract_list,3)
+corpus3 = TextCollection(n_gram_lists)
+preprocess.save(corpus3,'corpus3')
+print('corpus3构建完成！')
+kw_tfidf_dict_list = [tf_idf.tf_idf_kw_n_gram(kw_list_stem,corpus3) for kw_list_stem in keyword_list]
+tf_idf_abs_list = tf_idf.tf_idf_abs_all_n_gram(n_gram_lists, corpus3)
+preprocess.save(tf_idf_abs_list, 'all_abs_tfidf3')
+rank_list3 = tf_idf.get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list)
+preprocess.save(rank_list3,'tfidf_rank3')
+print('rank_list3: ',rank_list3)
+
+n_gram_lists = tf_idf.get_n_gram_list(abstract_list,4)
+corpus4 = TextCollection(n_gram_lists)
+preprocess.save(corpus4,'corpus4')
+print('corpus4构建完成！')
+kw_tfidf_dict_list = [tf_idf.tf_idf_kw_n_gram(kw_list_stem,corpus4) for kw_list_stem in keyword_list]
+tf_idf_abs_list = tf_idf.tf_idf_abs_all_n_gram(n_gram_lists, corpus4)
+preprocess.save(tf_idf_abs_list, 'all_abs_tfidf4')
+rank_list4 = tf_idf.get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list)
+preprocess.save(rank_list4,'tfidf_rank4')
+print('rank_list4: ',rank_list4)
+
+n_gram_lists = tf_idf.get_n_gram_list(abstract_list,5)
+corpus5 = TextCollection(n_gram_lists)
+preprocess.save(corpus5,'corpus5')
+print('corpus5构建完成！')
+kw_tfidf_dict_list = [tf_idf.tf_idf_kw_n_gram(kw_list_stem,corpus5) for kw_list_stem in keyword_list]
+tf_idf_abs_list = tf_idf.tf_idf_abs_all_n_gram(n_gram_lists, corpus5)
+preprocess.save(tf_idf_abs_list, 'all_abs_tfidf5')
+rank_list5 = tf_idf.get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list)
+preprocess.save(rank_list5,'tfidf_rank5')
+print('rank_list5: ',rank_list5)
+
+
+
+
+# tf_idf1 = tf_idf.tf_idf_abs(abstract_list[0], corpus1)
+# print('abstract的tf-ifd计算完毕')
+# keyword_list1 = [preprocess.stemming_str(keyword) for keyword in keyword_list[0]] #keyword_list已经stemming
+# print(keyword_list1)
+# print(abstract_list[0])
+# kw_tf_idf1 = tf_idf.tf_idf_kw(keyword_list1,corpus1)
+# tf_idf1.sort(reverse=True)
+# # print(tf_idf1)
+# print(kw_tf_idf1)
+# for keyword in kw_tf_idf1:
+#     print(keyword, tf_idf1.index(kw_tf_idf1.get(keyword)))
+
+
+
 # corpus1 = tf_idf.get_corpus_word(abstract_list)
 # all_tf_idf1 = tf_idf.tf_idf_abs_all(abstract_list,corpus1)
 

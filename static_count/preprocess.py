@@ -88,6 +88,14 @@ def stemming_list(str):
     return stem_list
 
 
+# 对所有的keyword stemming
+def stemming_all_keyword_list(keyword_lists):
+    stemming_results = []
+    for keyword_list in keyword_lists:
+        stemming_results.append([stemming_str(keyword) for keyword in keyword_list])
+    print(stemming_results)
+    return stemming_results
+
 # # stemming for a string, use tokenizer() (not remove stopwords)
 # # return: list
 # def stemming_tokenizer(str):
