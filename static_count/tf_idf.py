@@ -128,6 +128,11 @@ def get_kw_rank_all(kw_tfidf_dict_list,tf_idf_abs_list):
     return [get_kw_rank(kw_tfidf_dict_list[i], tf_idf_abs_list[i]) for i in range(len(tf_idf_abs_list))]
 
 
+# 获取n篇abstract的tfidf set的长度
+def get_abs_tfidf_set_num(tf_idf_abs_list):
+    return [len(set(tfidf_abs)) for tfidf_abs in tf_idf_abs_list]
+
+
 
 # 自定义tf-idf
 # # 以n_gram为单位计算tf
