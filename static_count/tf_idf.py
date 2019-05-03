@@ -16,10 +16,8 @@ def get_corpus_word(all_abs):
 # 计算一篇摘要的所有词的tf-idf (以word为单位)
 def tf_idf_abs(abstract, corpus):
     # abstract = set(abstract.split(' ')) # 对摘要分词
-    abstract = set(abstract) # 对摘要分词
-
-    tf_idf_list = [corpus.tf_idf(word, corpus) for word in abstract]
-
+    abstract = set(abstract)
+    tf_idf_list = [corpus.tf_idf(word, abstract) for word in abstract]
     return tf_idf_list
 
 
@@ -73,7 +71,10 @@ def get_corpus_ngram(n_gram_list):
 
 # 计算一篇摘要的所有词的tf-idf (以n_gram为单位)
 def tf_idf_abs_n_gram(abs_n_grams, corpus_ngram):
-    return [corpus_ngram.tf_idf(n_gram, corpus_ngram) for n_gram in set(abs_n_grams)]
+    # for n_gram in set(abs_n_grams):
+    #     tfidf = corpus_ngram.tf_idf(n_gram,abs_n_grams)
+    #     print(n_gram,': ', tfidf )
+    return [corpus_ngram.tf_idf(n_gram, abs_n_grams) for n_gram in set(abs_n_grams)]
 
 
 
